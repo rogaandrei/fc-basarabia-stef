@@ -55,6 +55,7 @@ const ourMatches = auto.matches.filter(m => m.home === OUR_TEAM || m.away === OU
 
 /** Marcatori trecuți de mână (etapele vechi). Ex: 4: ['Danu Garbuz ×2', 'Daniel Guma'] */
 const manualScorers: Record<number, string[]> = {
+  9: ['Danu Garbuz ×2', 'Viorel Ciugureanu ×2', 'Andrei Cebotari ×2'],
   8: ['Danu Garbuz ×2'],
   7: ['Andrei Cebotari', 'Nicolae Prisac'],
   6: ['Daniel Guma', 'Danu Garbuz'],
@@ -124,7 +125,7 @@ export const teamScorerRank = (p: Player) => (p.goals > 0 ? 1 + squad.filter(o =
 /** Golgheterul (golgheterii, la egalitate) echipei — calculat automat din goluri */
 export const topScorers = squad.filter(p => p.goals > 0 && teamScorerRank(p) === 1);
 
-type AwardPost = { name: string; date: string; permalink: string | null; opponent: string | null };
+type AwardPost = { name: string; names?: string[]; label?: string | null; date: string; permalink: string | null; opponent: string | null };
 const ig = instagram as { fanFavorite?: AwardPost; potm?: AwardPost };
 
 /** Rolul afișat sub nume pentru anumiți jucători (în rest se calculează din goluri) */
@@ -135,13 +136,21 @@ const roles: Record<string, string> = { 'Daniel Guma': 'Antrenor-jucător' };
  * (scripts/update-instagram.mjs → instagram-auto.json). Golgheterul vine din goluri.
  */
 const awards: { name: string; badge: string; note?: string; link?: string }[] = [
-  ig.fanFavorite && { name: ig.fanFavorite.name, badge: 'Fan Favorite', note: 'ales Fan Favorite de fani', link: ig.fanFavorite.permalink ?? undefined },
-  ig.potm && {
-    name: ig.potm.name,
-    badge: 'Player of the Match',
-    note: ig.potm.opponent ? `Player of the Match vs ${ig.potm.opponent}` : 'Player of the Match',
-    link: ig.potm.permalink ?? undefined
-  }
+  ...(ig.fanFavorite?.names ?? (ig.fanFavorite ? [ig.fanFavorite.name] : [])).map(name => ({
+    name,
+    badge: 'Fan Favorite',
+    note: 'ales Fan Favorite de fani',
+    link: ig.fanFavorite?.permalink ?? undefined
+  })),
+  ...(ig.potm?.names ?? (ig.potm ? [ig.potm.name] : [])).map(name => {
+    const label = ig.potm?.label ?? 'Player of the Match';
+    return {
+      name,
+      badge: label,
+      note: ig.potm?.opponent ? `${label} vs ${ig.potm.opponent}` : label,
+      link: ig.potm?.permalink ?? undefined
+    };
+  })
 ]
   .filter((a): a is NonNullable<typeof a> => Boolean(a));
 
