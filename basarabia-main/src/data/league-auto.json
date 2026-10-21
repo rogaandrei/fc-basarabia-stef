@@ -1373,5 +1373,28 @@
       "leagueRank": null
     }
   ],
-  "leagueScorers": 140
+  "leagueScorers": 140,
+  "goalSnapshots": {
+    "9": {
+      "Danu Garbuz": 7,
+      "Viorel Ciugureanu": 6,
+      "Andrei Cebotari": 5,
+      "Virgiliu Bubulici": 3,
+      "Daniel Guma": 2,
+      "Alexei Chirpii": 1,
+      "Ghenadii Rudei": 1,
+      "Marin Podelniuc": 1,
+      "Nicolae Prisac": 1,
+      "Teodor Negru": 1,
+      "Andrei Roga": 0,
+      "Denis Bandol": 0,
+      "Flavius Alexandru Vacarita": 0,
+      "Ion Mocanu": 0,
+      "Laurentiu Stici": 0,
+      "Nicu Zaporojan": 0,
+      "Sergiu Andronic": 0,
+      "Sergiu Dohotaru": 0
+    }
+  },
+  "autoScorers": {}
 }

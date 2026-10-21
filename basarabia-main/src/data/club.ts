@@ -4,7 +4,7 @@ import instagram from './instagram-auto.json';
 /**
  * Toate datele clubului într-un singur loc.
  * Clasamentul, rezultatele și programul se actualizează AUTOMAT din site-ul ligii
- * (scripts/update-league.mjs → league-auto.json). Aici completezi doar marcatorii.
+ * (scripts/update-league.mjs → league-auto.json), inclusiv marcatorii de la etapa 10.
  * Sursă oficială: https://www.alborzminifotbal.ro (Liga III-B)
  */
 
@@ -53,15 +53,25 @@ export type Result = {
 const OUR_TEAM = 'FC Basarabia';
 const ourMatches = auto.matches.filter(m => m.home === OUR_TEAM || m.away === OUR_TEAM);
 
-/**
- * Marcatorii noștri, pe etape — singurul lucru care se completează de mână
- * (site-ul ligii nu îi publică pe meci). Ex: 10: ['Danu Garbuz ×2', 'Daniel Guma']
- */
-export const scorersByRound: Record<number, string[]> = {
+/** Marcatori trecuți de mână (etapele vechi). Ex: 4: ['Danu Garbuz ×2', 'Daniel Guma'] */
+const manualScorers: Record<number, string[]> = {
   8: ['Danu Garbuz ×2'],
   7: ['Andrei Cebotari', 'Nicolae Prisac'],
   6: ['Daniel Guma', 'Danu Garbuz'],
   5: ['Viorel Ciugureanu', 'Ghenadii Rudei']
+};
+
+/**
+ * Marcatorii pe etape: de la etapa 10 AUTOMAT (din diferența de goluri pe site-ul ligii,
+ * vezi scripts/update-league.mjs). Ce scrii în manualScorers are prioritate — util pentru
+ * etapele vechi sau ca să corectezi ceva.
+ */
+const autoScorers = (auto as { autoScorers?: Record<string, { name: string; goals: number }[]> }).autoScorers ?? {};
+export const scorersByRound: Record<number, string[]> = {
+  ...Object.fromEntries(
+    Object.entries(autoScorers).map(([r, list]) => [Number(r), list.map(x => (x.goals > 1 ? `${x.name} ×${x.goals}` : x.name))])
+  ),
+  ...manualScorers
 };
 
 /** Cele mai recente primele (automat din site-ul ligii) */
