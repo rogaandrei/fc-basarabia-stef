@@ -1,6 +1,10 @@
+import auto from './league-auto.json';
+import instagram from './instagram-auto.json';
+
 /**
  * Toate datele clubului într-un singur loc.
- * Actualizează rezultatele / programul / clasamentul aici și reconstruiește site-ul (npm run build).
+ * Clasamentul, rezultatele și programul se actualizează AUTOMAT din site-ul ligii
+ * (scripts/update-league.mjs → league-auto.json). Aici completezi doar marcatorii.
  * Sursă oficială: https://www.alborzminifotbal.ro (Liga III-B)
  */
 
@@ -46,17 +50,33 @@ export type Result = {
   scorers?: string[];
 };
 
-/** Cele mai recente primele */
-export const results: Result[] = [
-  { round: 8, date: '2026-10-11T20:00:00+03:00', home: 'Novum Team', away: 'FC Basarabia', homeGoals: 7, awayGoals: 2, scorers: ['Danu Garbuz ×2'] },
-  { round: 7, date: '2026-10-09T20:00:00+03:00', home: 'FC Basarabia', away: 'Plopi', homeGoals: 2, awayGoals: 2, scorers: ['Andrei Cebotari', 'Nicolae Prisac'] },
-  { round: 6, date: '2026-10-03T14:00:00+03:00', home: 'BizCaffe', away: 'FC Basarabia', homeGoals: 2, awayGoals: 2, scorers: ['Daniel Guma', 'Danu Garbuz'] },
-  { round: 5, date: '2026-09-27T17:00:00+03:00', home: 'FC Basarabia', away: 'AS Viitorul Iohanisfeld', homeGoals: 2, awayGoals: 3, scorers: ['Viorel Ciugureanu', 'Ghenadii Rudei'] },
-  { round: 4, date: '2026-09-19T13:00:00+03:00', home: 'TMT', away: 'FC Basarabia', homeGoals: 0, awayGoals: 3 },
-  { round: 3, date: '2026-09-13T18:00:00+03:00', home: 'FC Basarabia', away: 'AS FC Real Timișoara', homeGoals: 6, awayGoals: 1 },
-  { round: 2, date: '2026-09-05T12:00:00+03:00', home: 'UCECOM', away: 'FC Basarabia', homeGoals: 5, awayGoals: 4 },
-  { round: 1, date: '2026-08-30T19:00:00+03:00', home: 'FC Basarabia', away: 'Lex TM', homeGoals: 5, awayGoals: 4 }
-];
+const OUR_TEAM = 'FC Basarabia';
+const ourMatches = auto.matches.filter(m => m.home === OUR_TEAM || m.away === OUR_TEAM);
+
+/**
+ * Marcatorii noștri, pe etape — singurul lucru care se completează de mână
+ * (site-ul ligii nu îi publică pe meci). Ex: 10: ['Danu Garbuz ×2', 'Daniel Guma']
+ */
+export const scorersByRound: Record<number, string[]> = {
+  8: ['Danu Garbuz ×2'],
+  7: ['Andrei Cebotari', 'Nicolae Prisac'],
+  6: ['Daniel Guma', 'Danu Garbuz'],
+  5: ['Viorel Ciugureanu', 'Ghenadii Rudei']
+};
+
+/** Cele mai recente primele (automat din site-ul ligii) */
+export const results: Result[] = ourMatches
+  .filter(m => m.hg !== null && m.ag !== null)
+  .map(m => ({
+    round: m.round,
+    date: m.kickoff,
+    home: m.home,
+    away: m.away,
+    homeGoals: m.hg as number,
+    awayGoals: m.ag as number,
+    scorers: scorersByRound[m.round]
+  }))
+  .sort((x, y) => y.round - x.round);
 
 export type Fixture = {
   round: number;
@@ -65,72 +85,91 @@ export type Fixture = {
   away: string;
 };
 
-/** Programul oficial — poate suferi modificări (verificați lunea pe site-ul ligii) */
-export const fixtures: Fixture[] = [
-  { round: 9, date: '2026-10-17T10:00:00+03:00', home: 'FC Basarabia', away: 'ZF Lifetec' },
-  { round: 10, date: '2026-10-25T21:00:00+02:00', home: 'Husenii', away: 'FC Basarabia' },
-  { round: 11, date: '2026-10-31T09:00:00+02:00', home: 'FC Basarabia', away: 'Athletic' },
-  { round: 12, date: '2026-11-08T21:00:00+02:00', home: 'FC Basarabia', away: 'FC Terra Tim' },
-  { round: 13, date: '2026-11-14T10:00:00+02:00', home: 'B 32 Army', away: 'FC Basarabia' },
-  { round: 14, date: '2026-11-22T20:00:00+02:00', home: 'FC Basarabia', away: 'Copiii Zăpezii' },
-  { round: 15, date: '2026-11-28T11:00:00+02:00', home: 'Vitabolic Crew', away: 'FC Basarabia' }
-];
+/** Programul oficial — automat din site-ul ligii (poate suferi modificări) */
+export const fixtures: Fixture[] = ourMatches
+  .filter(m => m.hg === null)
+  .map(m => ({ round: m.round, date: m.kickoff, home: m.home, away: m.away }))
+  .sort((x, y) => x.round - y.round);
 
 export type Row = { team: string; p: number; w: number; d: number; l: number; gf: number; ga: number; pts: number };
 
-/** Clasament Liga III-B după etapa 8 */
-export const standingsRound = 8;
-export const standings: Row[] = [
-  { team: 'Athletic', p: 8, w: 6, d: 1, l: 1, gf: 35, ga: 16, pts: 19 },
-  { team: 'AS FC Real Timișoara', p: 8, w: 6, d: 0, l: 2, gf: 44, ga: 26, pts: 18 },
-  { team: 'UCECOM', p: 8, w: 6, d: 0, l: 2, gf: 24, ga: 15, pts: 18 },
-  { team: 'Copiii Zăpezii', p: 8, w: 5, d: 1, l: 2, gf: 33, ga: 22, pts: 16 },
-  { team: 'Novum Team', p: 8, w: 5, d: 1, l: 2, gf: 27, ga: 19, pts: 16 },
-  { team: 'Plopi', p: 8, w: 4, d: 2, l: 2, gf: 25, ga: 22, pts: 14 },
-  { team: 'Husenii', p: 8, w: 4, d: 1, l: 3, gf: 29, ga: 31, pts: 13 },
-  { team: 'FC Terra Tim', p: 8, w: 4, d: 1, l: 3, gf: 24, ga: 26, pts: 13 },
-  { team: 'FC Basarabia', p: 8, w: 3, d: 2, l: 3, gf: 26, ga: 24, pts: 11 },
-  { team: 'AS Viitorul Iohanisfeld', p: 8, w: 3, d: 2, l: 3, gf: 30, ga: 30, pts: 11 },
-  { team: 'BizCaffe', p: 8, w: 2, d: 4, l: 2, gf: 21, ga: 18, pts: 10 },
-  { team: 'Vitabolic Crew', p: 8, w: 2, d: 2, l: 4, gf: 33, ga: 43, pts: 8 },
-  { team: 'B 32 Army', p: 8, w: 2, d: 1, l: 5, gf: 16, ga: 25, pts: 7 },
-  { team: 'ZF Lifetec', p: 8, w: 1, d: 0, l: 7, gf: 16, ga: 29, pts: 3 },
-  { team: 'Lex TM', p: 8, w: 1, d: 0, l: 7, gf: 14, ga: 31, pts: 3 },
-  { team: 'TMT', p: 8, w: 0, d: 2, l: 6, gf: 17, ga: 37, pts: 2 }
-];
+/** Clasament Liga III-B — automat din site-ul ligii */
+export const standingsRound: number = auto.round;
+export const standings: Row[] = auto.standings;
 
-export type Player = { name: string; goals: number; yellow: number; red: number };
+export type Player = { name: string; goals: number; yellow: number; red: number; leagueRank: number | null };
 
-/** Lotul legitimat (goluri din clasamentul golgheterilor Liga III-B) */
-export const squad: Player[] = [
-  { name: 'Danu Garbuz', goals: 5, yellow: 0, red: 0 },
-  { name: 'Viorel Ciugureanu', goals: 4, yellow: 0, red: 0 },
-  { name: 'Andrei Cebotari', goals: 3, yellow: 1, red: 0 },
-  { name: 'Virgiliu Bubulici', goals: 3, yellow: 1, red: 0 },
-  { name: 'Daniel Guma', goals: 2, yellow: 0, red: 0 },
-  { name: 'Alexei Chirpii', goals: 1, yellow: 0, red: 0 },
-  { name: 'Teodor Negru', goals: 1, yellow: 0, red: 0 },
-  { name: 'Marin Podelniuc', goals: 1, yellow: 0, red: 0 },
-  { name: 'Nicolae Prisac', goals: 1, yellow: 0, red: 0 },
-  { name: 'Ghenadii Rudei', goals: 1, yellow: 0, red: 1 },
-  { name: 'Sergiu Andronic', goals: 0, yellow: 0, red: 0 },
-  { name: 'Denis Bandol', goals: 0, yellow: 0, red: 0 },
-  { name: 'Sergiu Dohotaru', goals: 0, yellow: 0, red: 0 },
-  { name: 'Ion Mocanu', goals: 0, yellow: 1, red: 0 },
-  { name: 'Andrei Roga', goals: 0, yellow: 0, red: 0 },
-  { name: 'Laurentiu Stici', goals: 0, yellow: 0, red: 0 },
-  { name: 'Flavius Alexandru Vacarita', goals: 0, yellow: 0, red: 0 },
-  { name: 'Nicu Zaporojan', goals: 0, yellow: 0, red: 0 }
-];
+/** Lotul legitimat + goluri/cartonașe — automat din pagina echipei pe site-ul ligii */
+export const squad: Player[] = auto.squad;
+/** Câți jucători au marcat în toată Liga III-B (pentru „locul X din Y”) */
+export const leagueScorersCount: number = auto.leagueScorers;
 
-export type Spotlight = { name: string; role: string; highlight: string; badge: string };
+export type Spotlight = { name: string; role: string; highlight: string; badge: string; link?: string };
 
-export const spotlightPlayers: Spotlight[] = [
-  { name: 'Danu Garbuz', role: 'Golgheterul echipei', highlight: '5 goluri în campionat · ales Fan Favorite', badge: 'Fan Favorite' },
-  { name: 'Daniel Guma', role: 'Antrenor-jucător', highlight: 'Gol și prestație de nota 10 vs BizCaffe', badge: 'Player of the Match' },
-  { name: 'Viorel Ciugureanu', role: 'Marcator', highlight: '4 goluri în campionat', badge: 'Golgheter' },
-  { name: 'Andrei Cebotari', role: 'Marcator', highlight: '3 goluri, inclusiv vs Plopi', badge: 'Golgheter' }
-];
+const goalsText = (g: number) => `${g} ${g === 1 ? 'gol' : 'goluri'}`;
+
+/** Locul în echipă după goluri (la egalitate, același loc) */
+export const teamScorerRank = (p: Player) => (p.goals > 0 ? 1 + squad.filter(o => o.goals > p.goals).length : null);
+
+/** Golgheterul (golgheterii, la egalitate) echipei — calculat automat din goluri */
+export const topScorers = squad.filter(p => p.goals > 0 && teamScorerRank(p) === 1);
+
+type AwardPost = { name: string; date: string; permalink: string | null; opponent: string | null };
+const ig = instagram as { fanFavorite?: AwardPost; potm?: AwardPost };
+
+/** Rolul afișat sub nume pentru anumiți jucători (în rest se calculează din goluri) */
+const roles: Record<string, string> = { 'Daniel Guma': 'Antrenor-jucător' };
+
+/**
+ * Fan Favorite + Player of the Match — AUTOMAT din postările @fc__basarabia
+ * (scripts/update-instagram.mjs → instagram-auto.json). Golgheterul vine din goluri.
+ */
+const awards: { name: string; badge: string; note?: string; link?: string }[] = [
+  ig.fanFavorite && { name: ig.fanFavorite.name, badge: 'Fan Favorite', note: 'ales Fan Favorite de fani', link: ig.fanFavorite.permalink ?? undefined },
+  ig.potm && {
+    name: ig.potm.name,
+    badge: 'Player of the Match',
+    note: ig.potm.opponent ? `Player of the Match vs ${ig.potm.opponent}` : 'Player of the Match',
+    link: ig.potm.permalink ?? undefined
+  }
+]
+  .filter((a): a is NonNullable<typeof a> => Boolean(a));
+
+const SPOTLIGHT_CARDS = 4;
+
+function buildSpotlight(): Spotlight[] {
+  const byGoals = [...squad].sort((a, b) => b.goals - a.goals);
+  const picked: Player[] = [];
+  const add = (p?: Player) => p && !picked.includes(p) && picked.length < SPOTLIGHT_CARDS && picked.push(p);
+  topScorers.forEach(add);
+  awards.forEach(a => add(squad.find(p => p.name === a.name)));
+  byGoals.filter(p => p.goals > 0).forEach(add);
+
+  return picked
+    .sort((a, b) => b.goals - a.goals)
+    .map(p => {
+      const mine = awards.filter(a => a.name === p.name); // poate avea ambele premii
+      const rank = teamScorerRank(p);
+      const isTop = rank === 1;
+      const stats = [
+        p.goals > 0 ? `${goalsText(p.goals)} în campionat` : null,
+        p.leagueRank ? `locul ${p.leagueRank} în Liga III-B` : null
+      ].filter(Boolean).join(' · ');
+      const notes = mine.map(a => a.note).filter(Boolean).join(' · ');
+      return {
+        name: p.name,
+        role: isTop ? 'Golgheterul echipei' : roles[p.name] ?? (rank ? `Locul ${rank} la marcatori` : 'Jucător'),
+        highlight: [stats, notes].filter(Boolean).join(' · '),
+        badge: mine.length
+          ? mine.map(a => (mine.length > 1 && a.badge === 'Player of the Match' ? 'POTM' : a.badge)).join(' · ')
+          : isTop ? 'Golgheter' : 'Marcator',
+        link: mine.find(a => a.link)?.link
+      };
+    });
+}
+
+/** Cardurile „Jucători în formă” — se reordonează singure după goluri */
+export const spotlightPlayers: Spotlight[] = buildSpotlight();
 
 export const sponsors = [{ name: 'Banu Sport', note: 'Partener oficial' }];
 

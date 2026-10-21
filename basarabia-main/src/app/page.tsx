@@ -4,6 +4,7 @@ import Countdown from '@/components/Countdown';
 import Crest from '@/components/Crest';
 import JsonLd from '@/components/JsonLd';
 import StandingsTable from '@/components/StandingsTable';
+import SquadList from '@/components/SquadList';
 import SplitText from '@/components/reactbits/SplitText';
 import ShinyText from '@/components/reactbits/ShinyText';
 import CountUp from '@/components/reactbits/CountUp';
@@ -374,6 +375,11 @@ export default function Home() {
                       <h3 className="display text-2xl text-white sm:text-3xl">{p.name}</h3>
                       <p className="mt-1 text-xs font-bold uppercase tracking-[.18em] text-sky">{p.role}</p>
                       <p className="mt-3 text-sm text-muted">{p.highlight}</p>
+                      {p.link && (
+                        <a href={p.link} target="_blank" rel="noopener noreferrer" className="mt-auto pt-4 text-xs font-semibold text-sky hover:text-white">
+                          Vezi postarea pe Instagram →
+                        </a>
+                      )}
                     </article>
                   </SpotlightCard>
                 </li>
@@ -395,26 +401,7 @@ export default function Home() {
                 <dd className="font-semibold text-white">{club.kit}</dd>
               </dl>
             </SectionHead>
-            <ul className="grid grid-cols-1 gap-px overflow-hidden rounded-3xl bg-white/10 sm:grid-cols-2 lg:grid-cols-3">
-              {squad.map(p => (
-                <li key={p.name} className="flex items-center gap-4 bg-navy-950 px-5 py-4">
-                  <span aria-hidden="true" className="display grid h-11 w-11 shrink-0 place-items-center rounded-full bg-white/[.06] text-xl text-sky ring-1 ring-white/10">
-                    {p.name.split(' ').map(w => w[0]).filter((_, k, a) => k === 0 || k === a.length - 1).join('')}
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate font-semibold text-white">{p.name}</span>
-                    <span className="block text-xs text-muted">
-                      {p.goals > 0 ? `${p.goals} ${p.goals === 1 ? 'gol' : 'goluri'}` : 'Jucător'}
-                    </span>
-                  </span>
-                  <span className="flex items-center gap-1" aria-label={`${p.goals} goluri, ${p.yellow} cartonașe galbene, ${p.red} cartonașe roșii`}>
-                    {p.goals > 0 && <span className="display rounded-md bg-brand px-2 text-lg text-white">{p.goals}</span>}
-                    {p.yellow > 0 && <span className="h-5 w-3.5 rounded-sm bg-yellow-300" title="Cartonaș galben" />}
-                    {p.red > 0 && <span className="h-5 w-3.5 rounded-sm bg-red-500" title="Cartonaș roșu" />}
-                  </span>
-                </li>
-              ))}
-            </ul>
+            <SquadList squad={squad} results={results} />
           </div>
         </section>
 
