@@ -176,10 +176,36 @@ const scorers = parseScorers(scorersHtml);
 const squad = parseSquad(squadHtml, scorers);
 const round = Math.max(...standings.map(r => r.p));
 
-const data = { source: STANDINGS_URL, round, standings, matches, squad, leagueScorers: scorers.length };
+const previous = await readFile(OUT, 'utf8').catch(() => '');
+
+/**
+ * Marcatori pe meci — calculați din diferența de goluri.
+ * Site-ul ligii dă doar totalul pe sezon, dar FC Basarabia joacă un singur meci pe etapă:
+ * golurile apărute la un jucător între „după etapa X” și „după etapa Y” sunt din meciul etapei Y.
+ * `goalSnapshots[etapă]` = golurile fiecărui jucător după ultima noastră etapă jucată
+ * (se rescrie la fiecare rulare, ca să prindă și actualizările întârziate ale ligii).
+ */
+const prevData = previous ? JSON.parse(previous) : {};
+const ourPlayed = matches.filter(m => (m.home === 'FC Basarabia' || m.away === 'FC Basarabia') && m.hg !== null);
+const lastOurRound = Math.max(0, ...ourPlayed.map(m => m.round));
+const goalSnapshots = { ...(prevData.goalSnapshots ?? {}) };
+if (lastOurRound) goalSnapshots[lastOurRound] = Object.fromEntries(squad.map(p => [p.name, p.goals]));
+
+const autoScorers = {};
+const snapRounds = Object.keys(goalSnapshots).map(Number).sort((a, b) => a - b);
+for (let i = 1; i < snapRounds.length; i++) {
+  const before = goalSnapshots[snapRounds[i - 1]];
+  const after = goalSnapshots[snapRounds[i]];
+  const list = Object.entries(after)
+    .map(([name, g]) => ({ name, goals: g - (before[name] ?? 0) }))
+    .filter(x => x.goals > 0)
+    .sort((a, b) => b.goals - a.goals);
+  if (list.length) autoScorers[snapRounds[i]] = list;
+}
+
+const data = { source: STANDINGS_URL, round, standings, matches, squad, leagueScorers: scorers.length, goalSnapshots, autoScorers };
 const json = JSON.stringify(data, null, 2) + '\n';
 
-const previous = await readFile(OUT, 'utf8').catch(() => '');
 if (previous === json) {
   console.log(`Nicio schimbare (după etapa ${round}).`);
 } else {
