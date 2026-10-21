@@ -1,0 +1,75 @@
+# Actualizează automat site-ul:
+#   • clasament / rezultate / program / goluri jucători  ← alborzminifotbal.ro
+#   • Fan Favorite / Player of the Match                ← postările @fc__basarabia (Instagram)
+# Dacă s-a schimbat ceva, face commit → Vercel republică site-ul singur.
+name: Actualizare site
+
+on:
+  schedule:
+    # ora UTC; România = UTC+2/+3. Zilnic la ~09, 15, 21 și 00 ora României
+    - cron: '0 6,12,18,21 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-site
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # proiectul poate fi în rădăcina repo-ului sau într-un subfolder (ex. basarabia-main)
+      - name: Găsește folderul site-ului
+        run: |
+          SCRIPT=$(find . -name update-league.mjs -not -path '*/node_modules/*' | head -1)
+          if [ -z "$SCRIPT" ]; then echo "::error::Nu găsesc scripts/update-league.mjs"; exit 1; fi
+          echo "APP_DIR=$(dirname "$(dirname "$SCRIPT")")" >> "$GITHUB_ENV"
+
+      - name: Liga — clasament, rezultate, goluri
+        working-directory: ${{ env.APP_DIR }}
+        run: node scripts/update-league.mjs
+
+      - name: Instagram — Fan Favorite / Player of the Match
+        id: ig
+        continue-on-error: true
+        working-directory: ${{ env.APP_DIR }}
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+        run: node scripts/update-instagram.mjs
+
+      - name: Commit dacă s-a schimbat ceva
+        working-directory: ${{ env.APP_DIR }}
+        run: |
+          if git diff --quiet -- src/data/league-auto.json src/data/instagram-auto.json; then
+            echo "Nicio schimbare."
+            exit 0
+          fi
+          git config user.name  "fc-basarabia-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/data/league-auto.json src/data/instagram-auto.json
+          git commit -m "Date actualizate automat (ligă / Instagram)"
+          git push
+          echo "changed=1" >> "$GITHUB_ENV"
+
+      - name: Pornește deploy Vercel (opțional)
+        if: env.changed == '1'
+        env:
+          HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+        run: |
+          if [ -n "$HOOK" ]; then curl -fsS -X POST "$HOOK"; else echo "Fără deploy hook — Vercel preia commit-ul."; fi
+
+      - name: Verifică Instagram
+        if: steps.ig.outcome == 'failure'
+        run: |
+          echo "::error::Instagram nu a răspuns — probabil a expirat cheia IG_ACCESS_TOKEN. Generează una nouă (vezi INSTAGRAM.md)."
+          exit 1
