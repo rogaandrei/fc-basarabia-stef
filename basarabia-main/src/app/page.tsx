@@ -293,9 +293,7 @@ export default function Home() {
         <section id="rezultate" aria-labelledby="rezultate-title" className="relative bg-navy-900 py-20 sm:py-28">
           <div className="stripe-band absolute inset-x-0 top-0 opacity-80" aria-hidden="true" />
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <SectionHead kicker="Final de meci" title="Rezultate" id="rezultate-title">
-              <p className="max-w-sm text-muted">Capul sus, băieți, mergem înainte! Toate cele {results.length} etape jucate în {club.league}.</p>
-            </SectionHead>
+            <SectionHead kicker="Final de meci" title="Rezultate" id="rezultate-title" />
             <ul className="grid gap-5 md:grid-cols-2">
               {results.slice(0, 4).map(r => {
                 const o = outcome(r);
@@ -359,11 +357,7 @@ export default function Home() {
         {/* ───────────── CLASAMENT ───────────── */}
         <section id="clasament" aria-labelledby="clasament-title" className="bg-navy-950 py-20 sm:py-28">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <SectionHead kicker={club.competition} title={`Clasament ${club.league}`} id="clasament-title">
-              <p className="max-w-sm text-muted">
-                După etapa {standingsRound}. Culoarea din dreptul locului arată promovarea, barajele și retrogradarea — vezi legenda de sub tabel.
-              </p>
-            </SectionHead>
+            <SectionHead kicker={club.competition} title={`Clasament ${club.league}`} id="clasament-title" />
             <StandingsTable />
             <p className="mt-4 text-xs text-muted">
               <a href={club.leagueUrl} target="_blank" rel="noopener noreferrer" className="font-semibold text-sky hover:text-white">Sursa: alborzminifotbal.ro →</a>
@@ -374,9 +368,7 @@ export default function Home() {
         {/* ───────────── JUCĂTORI ───────────── */}
         <section id="jucatori" aria-labelledby="jucatori-title" className="bg-navy-900 py-20 sm:py-28">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <SectionHead kicker="Lotul" title="Jucători în formă" id="jucatori-title">
-              <p className="max-w-sm text-muted">Votați de fani, apreciați pe teren. Votează Fan Favorite pe Instagram după meci.</p>
-            </SectionHead>
+            <SectionHead kicker="Lotul" title="Jucători în formă" id="jucatori-title" />
             <ul className={`grid grid-cols-2 gap-3 sm:gap-5 ${spotlightPlayers.length > 3 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}>
               {spotlightPlayers.map(sp => ({ ...sp, image: sp.image ?? (sp.badge === 'Golgheter' ? playerPhotos[sp.name] : undefined) })).map((p, i) => (
                 <li key={`${p.badge}-${p.name}`} className={spotlightPlayers.length === 3 && i === 2 ? 'col-span-2 mx-auto w-[calc(50%-0.375rem)] lg:col-span-1 lg:mx-0 lg:w-auto' : undefined}>
@@ -596,31 +588,6 @@ export default function Home() {
       <footer className="relative bg-navy-950 pt-14 pb-10">
         <div className="stripe-band absolute inset-x-0 top-0" aria-hidden="true" />
         <div className="mx-auto flex max-w-7xl flex-col items-center gap-6 px-4 text-center sm:px-6 lg:px-8">
-          <ul className="grid grid-cols-4 gap-x-6 gap-y-5 sm:flex sm:flex-wrap sm:justify-center sm:gap-x-10" aria-label="Simboluri ale Basarabiei">
-            {[
-              ['arc-de-triumf', 'Arcul de Triumf'],
-              ['hora', 'Hora'],
-              ['ie', 'Ia tradițională'],
-              ['50-bani', 'Moneda de 50 de bani'],
-              ['porumbel', 'Porumbelul'],
-              ['stema', 'Stema'],
-              ['barza', 'Barza'],
-              ['zimbru', 'Zimbrul']
-            ].map(([file, name]) => (
-              <li key={file} className="flex justify-center">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={`/symbols/${file}.webp`}
-                  alt={name}
-                  title={name}
-                  width={56}
-                  height={56}
-                  loading="lazy"
-                  className="h-12 w-12 opacity-60 transition hover:scale-110 hover:opacity-100 sm:h-14 sm:w-14"
-                />
-              </li>
-            ))}
-          </ul>
           <Crest size={72} />
           <p className="display text-4xl text-white">Hai, FC Basarabia!</p>
           <ul className="flex items-center gap-3" aria-label="Rețele sociale">
