@@ -5,6 +5,8 @@ import Crest from '@/components/Crest';
 import JsonLd from '@/components/JsonLd';
 import StandingsTable from '@/components/StandingsTable';
 import SquadList from '@/components/SquadList';
+import { readdirSync } from 'node:fs';
+import path from 'node:path';
 import SplitText from '@/components/reactbits/SplitText';
 import ShinyText from '@/components/reactbits/ShinyText';
 import CountUp from '@/components/reactbits/CountUp';
@@ -15,6 +17,28 @@ import GradientText from '@/components/reactbits/GradientText';
 import { club, fixtures, results, standingsRound, squad, spotlightPlayers, sponsors, outcome, isOurs, ourRow, ourPosition, fmt } from '@/data/club';
 
 const BUILD_TIME = Date.now();
+/**
+ * Pozele jucătorilor: pui fișierul în public/players cu numele jucătorului,
+ * ex. „danu-garbuz.jpg” (sau „garbuz-danu.jpg”, .jpg/.png/.webp). Fără poză → inițialele.
+ */
+const slug = (s: string) =>
+  s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const photoFiles = (() => {
+  try {
+    return readdirSync(path.join(process.cwd(), 'public', 'players')).filter(f => /\.(jpe?g|png|webp|avif)$/i.test(f));
+  } catch {
+    return [];
+  }
+})();
+const playerPhotos: Record<string, string> = Object.fromEntries(
+  squad.flatMap(p => {
+    const words = p.name.split(' ');
+    const keys = [slug(p.name), slug([words.at(-1), ...words.slice(0, -1)].join(' '))];
+    const file = photoFiles.find(f => keys.includes(slug(f.replace(/\.[a-z]+$/i, ''))));
+    return file ? [[p.name, `/players/${file}`]] : [];
+  })
+);
+
 const upcoming = fixtures.filter(f => new Date(f.date).getTime() > BUILD_TIME - 2 * 3600_000);
 const nextMatch = upcoming[0];
 
@@ -337,14 +361,11 @@ export default function Home() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <SectionHead kicker={club.competition} title={`Clasament ${club.league}`} id="clasament-title">
               <p className="max-w-sm text-muted">
-                După etapa {standingsRound}. Locurile 1–3 promovează direct în Liga II, locul 4 joacă baraj de promovare.
+                După etapa {standingsRound}. Culoarea din dreptul locului arată promovarea, barajele și retrogradarea — vezi legenda de sub tabel.
               </p>
             </SectionHead>
             <StandingsTable />
-            <p className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-muted">
-              <span className="inline-flex items-center gap-2"><span className="h-3 w-1 rounded bg-emerald-400" aria-hidden="true" />Promovare directă</span>
-              <span className="inline-flex items-center gap-2"><span className="h-3 w-1 rounded bg-sky" aria-hidden="true" />Baraj de promovare</span>
-              <span className="inline-flex items-center gap-2">Ultimele 5: treci cu mouse-ul (sau atinge) un cerc pentru scor</span>
+            <p className="mt-4 text-xs text-muted">
               <a href={club.leagueUrl} target="_blank" rel="noopener noreferrer" className="font-semibold text-sky hover:text-white">Sursa: alborzminifotbal.ro →</a>
             </p>
           </div>
@@ -356,16 +377,23 @@ export default function Home() {
             <SectionHead kicker="Lotul" title="Jucători în formă" id="jucatori-title">
               <p className="max-w-sm text-muted">Votați de fani, apreciați pe teren. Votează Fan Favorite pe Instagram după meci.</p>
             </SectionHead>
-            <ul className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
-              {spotlightPlayers.map((p, i) => (
-                <li key={p.name}>
+            <ul className={`grid grid-cols-2 gap-3 sm:gap-5 ${spotlightPlayers.length > 3 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}>
+              {spotlightPlayers.map(sp => ({ ...sp, image: sp.image ?? (sp.badge === 'Golgheter' ? playerPhotos[sp.name] : undefined) })).map((p, i) => (
+                <li key={`${p.badge}-${p.name}`} className={spotlightPlayers.length === 3 && i === 2 ? 'col-span-2 mx-auto w-[calc(50%-0.375rem)] lg:col-span-1 lg:mx-0 lg:w-auto' : undefined}>
                   <SpotlightCard className="h-full rounded-3xl p-3 sm:p-6" spotlightColor="rgba(142,197,255,.45)" style={cardStyle}>
                     <article className="relative flex h-full flex-col">
                       <div className="relative mb-4 flex aspect-square items-end sm:mb-6 sm:aspect-[4/5] overflow-hidden rounded-2xl bg-gradient-to-br from-brand via-navy-700 to-navy-900 p-4">
-                        <span className="display absolute -right-2 -top-6 text-[5rem] leading-none text-white/10 sm:text-[10rem]" aria-hidden="true">
+                        {p.image && (
+                          <>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={p.image} alt={`${p.name} — ${p.badge}`} loading="lazy" className="absolute inset-0 h-full w-full object-cover object-top" />
+                            <span className="absolute inset-0 bg-gradient-to-t from-navy-950/70 via-transparent to-transparent" aria-hidden="true" />
+                          </>
+                        )}
+                        <span className={`display absolute -right-2 -top-6 text-[5rem] leading-none text-white/10 sm:text-[10rem] ${p.image ? 'hidden' : ''}`} aria-hidden="true">
                           {String(i + 1).padStart(2, '0')}
                         </span>
-                        <span className="display text-5xl text-white/95 sm:text-7xl" aria-hidden="true">
+                        <span className={`display text-5xl text-white/95 sm:text-7xl ${p.image ? 'hidden' : ''}`} aria-hidden="true">
                           {p.name.replace(/[„”"]/g, '').split(' ').filter(Boolean).map(w => w[0]).filter((_, k, a) => k === 0 || k === a.length - 1).join('')}
                         </span>
                         <span className="absolute left-2 top-2 rounded-full bg-white px-2 py-1 text-[9px] sm:left-4 sm:top-4 sm:px-3 sm:text-[10px] font-extrabold uppercase tracking-widest text-navy-900">
@@ -401,7 +429,7 @@ export default function Home() {
                 <dd className="font-semibold text-white">{club.kit}</dd>
               </dl>
             </SectionHead>
-            <SquadList squad={squad} results={results} />
+            <SquadList squad={squad} results={results} photos={playerPhotos} />
           </div>
         </section>
 
@@ -514,26 +542,52 @@ export default function Home() {
         {/* ───────────── CONTACT ───────────── */}
         <section id="contact" aria-labelledby="contact-title" className="bg-navy-900 py-20 sm:py-28">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <SectionHead kicker="Contact" title="Ne vedem pe teren" id="contact-title" />
-            <div className="grid gap-5 md:grid-cols-3">
-              <a href={club.ground.mapsUrl} target="_blank" rel="noopener noreferrer" className="group rounded-3xl bg-white/[.04] p-8 ring-1 ring-white/10 transition hover:ring-sky/50">
-                <PinIcon size={28} />
-                <h3 className="display mt-4 text-3xl text-white">Teren</h3>
-                <address className="mt-2 not-italic text-muted">{club.ground.street}, {club.ground.city}</address>
-                <span className="mt-4 inline-block text-sm font-semibold text-sky group-hover:text-white">Deschide în Google Maps →</span>
-              </a>
-              <a href={club.instagram} target="_blank" rel="noopener noreferrer" className="group rounded-3xl bg-white/[.04] p-8 ring-1 ring-white/10 transition hover:ring-sky/50">
-                <InstagramIcon size={28} />
-                <h3 className="display mt-4 text-3xl text-white">Instagram</h3>
-                <p className="mt-2 text-muted">{club.instagramHandle} — noutăți, matchday și votul pentru Fan Favorite.</p>
-                <span className="mt-4 inline-block text-sm font-semibold text-sky group-hover:text-white">Urmărește-ne →</span>
-              </a>
-              <a href={club.instagram} target="_blank" rel="noopener noreferrer" className="group rounded-3xl bg-white/[.04] p-8 ring-1 ring-white/10 transition hover:ring-sky/50">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#A2C6E0" strokeWidth="2" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="M12 7v5l3 3" /></svg>
-                <h3 className="display mt-4 text-3xl text-white">Vrei să joci?</h3>
-                <p className="mt-2 text-muted">Căutăm mereu jucători motivați. Trimite-ne un mesaj și vino la un antrenament.</p>
-                <span className="mt-4 inline-block text-sm font-semibold text-sky group-hover:text-white">Trimite mesaj →</span>
-              </a>
+            <SectionHead kicker="Contact" title="Ne vedem pe teren" id="contact-title">
+              <p className="max-w-sm text-muted">Scrie-ne, urmărește-ne sau vino direct la meci. Orice susținere contează.</p>
+            </SectionHead>
+
+            {/* Devino suporter — grupul de WhatsApp */}
+            <div className="relative mb-5 overflow-hidden rounded-3xl bg-gradient-to-br from-brand via-navy-700 to-navy-900 p-8 ring-1 ring-white/10 sm:p-10">
+              <div aria-hidden="true" className="absolute -right-10 -top-10 opacity-[.08]">
+                <Crest size={260} />
+              </div>
+              <div className="relative flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+                <div className="max-w-2xl">
+                  <p className="text-[11px] font-bold uppercase tracking-[.2em] text-sky">Comunitatea FC Basarabia</p>
+                  <h3 className="display mt-2 text-4xl text-white sm:text-5xl">Devino suporter FC Basarabia</h3>
+                  <p className="mt-3 text-white/80">
+                    Intră în grupul suporterilor pe WhatsApp: programul meciurilor, rezultate pe loc, poze și invitații la evenimentele
+                    comunității. Vino în tribună și susține-ne!
+                  </p>
+                </div>
+                <a
+                  href={club.supporters}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex shrink-0 items-center justify-center gap-3 rounded-full bg-white px-7 py-4 font-bold text-navy-950 shadow-lg shadow-navy-950/30 transition hover:bg-sky"
+                >
+                  <WhatsAppIcon size={22} />
+                  Intră în grupul suporterilor
+                </a>
+              </div>
+            </div>
+
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-6">
+              <ContactCard className="lg:col-span-3" href={club.ground.mapsUrl} icon={<PinIcon size={28} />} title="Teren" cta="Deschide în Google Maps →">
+                <address className="not-italic">{club.ground.street}, {club.ground.city}</address>
+              </ContactCard>
+              <ContactCard className="lg:col-span-3" href={`mailto:${club.email}`} icon={<MailIcon size={28} />} title="E-mail" cta="Scrie-ne →" external={false}>
+                <span className="break-all">{club.email}</span> — parteneriate, presă, sponsorizări.
+              </ContactCard>
+              <ContactCard className="lg:col-span-2" href={club.instagram} icon={<InstagramIcon size={28} />} title="Instagram" cta="Urmărește-ne →">
+                {club.instagramHandle} — noutăți, matchday și votul pentru Fan Favorite.
+              </ContactCard>
+              <ContactCard className="lg:col-span-2" href={club.facebook} icon={<FacebookIcon size={28} />} title="Facebook" cta="Dă like paginii →">
+                FC Basarabia pe Facebook — anunțuri, poze și evenimentele comunității.
+              </ContactCard>
+              <ContactCard className="sm:col-span-2 lg:col-span-2" href={club.youtube} icon={<YouTubeIcon size={28} />} title="YouTube" cta="Abonează-te →">
+                {club.youtubeHandle} — rezumate, goluri și momente de la meciuri.
+              </ContactCard>
             </div>
           </div>
         </section>
@@ -542,8 +596,55 @@ export default function Home() {
       <footer className="relative bg-navy-950 pt-14 pb-10">
         <div className="stripe-band absolute inset-x-0 top-0" aria-hidden="true" />
         <div className="mx-auto flex max-w-7xl flex-col items-center gap-6 px-4 text-center sm:px-6 lg:px-8">
+          <ul className="grid grid-cols-4 gap-x-6 gap-y-5 sm:flex sm:flex-wrap sm:justify-center sm:gap-x-10" aria-label="Simboluri ale Basarabiei">
+            {[
+              ['arc-de-triumf', 'Arcul de Triumf'],
+              ['hora', 'Hora'],
+              ['ie', 'Ia tradițională'],
+              ['50-bani', 'Moneda de 50 de bani'],
+              ['porumbel', 'Porumbelul'],
+              ['stema', 'Stema'],
+              ['barza', 'Barza'],
+              ['zimbru', 'Zimbrul']
+            ].map(([file, name]) => (
+              <li key={file} className="flex justify-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={`/symbols/${file}.webp`}
+                  alt={name}
+                  title={name}
+                  width={56}
+                  height={56}
+                  loading="lazy"
+                  className="h-12 w-12 opacity-60 transition hover:scale-110 hover:opacity-100 sm:h-14 sm:w-14"
+                />
+              </li>
+            ))}
+          </ul>
           <Crest size={72} />
           <p className="display text-4xl text-white">Hai, FC Basarabia!</p>
+          <ul className="flex items-center gap-3" aria-label="Rețele sociale">
+            {[
+              { href: club.instagram, label: 'Instagram', icon: <InstagramIcon size={18} /> },
+              { href: club.facebook, label: 'Facebook', icon: <FacebookIcon size={18} /> },
+              { href: club.youtube, label: 'YouTube', icon: <YouTubeIcon size={18} /> },
+              { href: club.supporters, label: 'Grupul suporterilor pe WhatsApp', icon: <WhatsAppIcon size={18} /> },
+              { href: `mailto:${club.email}`, label: 'E-mail', icon: <MailIcon size={18} /> }
+            ].map(l => (
+              <li key={l.label}>
+                <a
+                  href={l.href}
+                  target={l.href.startsWith('mailto:') ? undefined : '_blank'}
+                  rel="noopener noreferrer"
+                  aria-label={l.label}
+                  title={l.label}
+                  className="grid h-11 w-11 place-items-center rounded-full bg-white/[.06] text-white/80 ring-1 ring-white/10 transition hover:bg-brand hover:text-white"
+                >
+                  {l.icon}
+                </a>
+              </li>
+            ))}
+          </ul>
           <p className="text-sm text-muted">
             © {new Date().getFullYear()} {club.legalName}. {club.tagline}
           </p>
@@ -568,6 +669,73 @@ function InstagramIcon({ size = 18 }: { size?: number }) {
       <rect x="3" y="3" width="18" height="18" rx="5" />
       <circle cx="12" cy="12" r="4" />
       <circle cx="17.5" cy="6.5" r="1" fill="currentColor" />
+    </svg>
+  );
+}
+
+function ContactCard({
+  href,
+  icon,
+  title,
+  cta,
+  external = true,
+  className = '',
+  children
+}: {
+  href: string;
+  icon: React.ReactNode;
+  title: string;
+  cta: string;
+  external?: boolean;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <a
+      href={href}
+      {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+      className={`group flex flex-col rounded-3xl bg-white/[.04] p-8 ring-1 ring-white/10 transition hover:ring-sky/50 ${className}`}
+    >
+      {icon}
+      <h3 className="display mt-4 text-3xl text-white">{title}</h3>
+      <div className="mt-2 text-muted">{children}</div>
+      <span className="mt-auto pt-4 text-sm font-semibold text-sky group-hover:text-white">{cta}</span>
+    </a>
+  );
+}
+
+const iconStroke = (size: number) => (size > 20 ? '#A2C6E0' : 'currentColor');
+
+function MailIcon({ size = 18 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={iconStroke(size)} strokeWidth="2" aria-hidden="true">
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="m3 7 9 6 9-6" />
+    </svg>
+  );
+}
+
+function FacebookIcon({ size = 18 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={iconStroke(size)} strokeWidth="2" aria-hidden="true">
+      <path d="M15 3h-2.5A4.5 4.5 0 0 0 8 7.5V10H5.5v4H8v7h4v-7h3l.5-4H12V7.8c0-.7.4-1 1-1h2z" />
+    </svg>
+  );
+}
+
+function YouTubeIcon({ size = 18 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={iconStroke(size)} strokeWidth="2" aria-hidden="true">
+      <rect x="2.5" y="5.5" width="19" height="13" rx="4" />
+      <path d="m10 9.5 5 2.5-5 2.5z" fill="currentColor" />
+    </svg>
+  );
+}
+
+function WhatsAppIcon({ size = 18 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 2s.8 2.3 1 2.5c.1.2 1.6 2.5 4 3.5 1.5.6 2 .7 2.8.6.4-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2l-.4-.3z" />
     </svg>
   );
 }

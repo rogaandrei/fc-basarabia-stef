@@ -1,14 +1,26 @@
 {
   "fanFavorite": {
     "name": "Danu Garbuz",
+    "names": [
+      "Danu Garbuz"
+    ],
+    "label": null,
     "date": "2026-10-01",
     "permalink": "https://www.instagram.com/p/Dd9k8VFA3dg/",
-    "opponent": null
+    "postId": "18110955125520233",
+    "opponent": null,
+    "image": "/instagram/fanFavorite-18110955125520233.jpg"
   },
   "potm": {
     "name": "Andrei Cebotari",
+    "names": [
+      "Andrei Cebotari"
+    ],
+    "label": null,
     "date": "2026-09-18",
     "permalink": "https://www.instagram.com/p/DdbQgjig8m8/",
-    "opponent": "AS FC Real Timișoara"
+    "postId": "18024921824879240",
+    "opponent": "AS FC Real Timișoara",
+    "image": "/instagram/potm-18024921824879240.jpg"
   }
 }

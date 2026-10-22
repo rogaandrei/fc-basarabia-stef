@@ -10,7 +10,8 @@
       "l": 1,
       "gf": 38,
       "ga": 17,
-      "pts": 22
+      "pts": 22,
+      "zone": "promo"
     },
     {
       "team": "AS FC Real Timișoara",
@@ -20,7 +21,8 @@
       "l": 2,
       "gf": 50,
       "ga": 29,
-      "pts": 21
+      "pts": 21,
+      "zone": "promo"
     },
     {
       "team": "Copiii Zăpezii",
@@ -30,7 +32,8 @@
       "l": 2,
       "gf": 37,
       "ga": 24,
-      "pts": 19
+      "pts": 19,
+      "zone": "promo"
     },
     {
       "team": "UCECOM",
@@ -40,7 +43,8 @@
       "l": 3,
       "gf": 27,
       "ga": 21,
-      "pts": 18
+      "pts": 18,
+      "zone": "promoPlayoff"
     },
     {
       "team": "Novum Team",
@@ -50,7 +54,8 @@
       "l": 2,
       "gf": 29,
       "ga": 21,
-      "pts": 17
+      "pts": 17,
+      "zone": null
     },
     {
       "team": "FC Basarabia",
@@ -60,7 +65,8 @@
       "l": 3,
       "gf": 32,
       "ga": 27,
-      "pts": 14
+      "pts": 14,
+      "zone": null
     },
     {
       "team": "Plopi",
@@ -70,7 +76,8 @@
       "l": 3,
       "gf": 26,
       "ga": 24,
-      "pts": 14
+      "pts": 14,
+      "zone": null
     },
     {
       "team": "FC Terra Tim",
@@ -80,7 +87,8 @@
       "l": 3,
       "gf": 26,
       "ga": 28,
-      "pts": 14
+      "pts": 14,
+      "zone": null
     },
     {
       "team": "Husenii",
@@ -90,7 +98,8 @@
       "l": 4,
       "gf": 30,
       "ga": 34,
-      "pts": 13
+      "pts": 13,
+      "zone": null
     },
     {
       "team": "AS Viitorul Iohanisfeld",
@@ -100,7 +109,8 @@
       "l": 4,
       "gf": 30,
       "ga": 33,
-      "pts": 11
+      "pts": 11,
+      "zone": null
     },
     {
       "team": "Vitabolic Crew",
@@ -110,7 +120,8 @@
       "l": 4,
       "gf": 36,
       "ga": 43,
-      "pts": 11
+      "pts": 11,
+      "zone": null
     },
     {
       "team": "BizCaffe",
@@ -120,7 +131,8 @@
       "l": 3,
       "gf": 23,
       "ga": 22,
-      "pts": 10
+      "pts": 10,
+      "zone": null
     },
     {
       "team": "B 32 Army",
@@ -130,7 +142,8 @@
       "l": 5,
       "gf": 18,
       "ga": 26,
-      "pts": 10
+      "pts": 10,
+      "zone": "relegPlayoff"
     },
     {
       "team": "TMT",
@@ -140,7 +153,8 @@
       "l": 6,
       "gf": 20,
       "ga": 38,
-      "pts": 5
+      "pts": 5,
+      "zone": "releg"
     },
     {
       "team": "ZF Lifetec",
@@ -150,7 +164,8 @@
       "l": 8,
       "gf": 19,
       "ga": 35,
-      "pts": 3
+      "pts": 3,
+      "zone": "releg"
     },
     {
       "team": "Lex TM",
@@ -160,7 +175,8 @@
       "l": 8,
       "gf": 15,
       "ga": 34,
-      "pts": 3
+      "pts": 3,
+      "zone": "releg"
     }
   ],
   "matches": [

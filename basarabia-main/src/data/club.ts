@@ -32,11 +32,15 @@ export const club = {
   },
   instagram: 'https://www.instagram.com/fc__basarabia/',
   instagramHandle: '@fc__basarabia',
+  facebook: 'https://www.facebook.com/fcbasarabia',
+  youtube: 'https://www.youtube.com/@FCBASARABIA',
+  youtubeHandle: '@FCBASARABIA',
+  /** Grupul de WhatsApp al suporterilor */
+  supporters: 'https://chat.whatsapp.com/IPc7jmt2gsEHcmtbvJUh1o',
   formular230: 'https://formular230.ro/asociatia-fotbal-club-basarabia',
   leagueUrl: 'https://www.alborzminifotbal.ro/clasament-liga-III-B.html',
   programUrl: 'https://www.alborzminifotbal.ro/program-liga-III-B.html',
-  // TODO: adaugă un e-mail / telefon oficial dacă există
-  email: '',
+  email: 'fcbasarabia@gmail.com',
   colors: { navy: '#021535', blue: '#0A6DFE', sky: '#8EC5FF', white: '#FFFFFF' }
 } as const;
 
@@ -102,11 +106,20 @@ export const fixtures: Fixture[] = ourMatches
   .map(m => ({ round: m.round, date: m.kickoff, home: m.home, away: m.away }))
   .sort((x, y) => x.round - y.round);
 
-export type Row = { team: string; p: number; w: number; d: number; l: number; gf: number; ga: number; pts: number };
+export type Zone = 'promo' | 'promoPlayoff' | 'relegPlayoff' | 'releg';
+export type Row = { team: string; p: number; w: number; d: number; l: number; gf: number; ga: number; pts: number; zone?: Zone | null };
+
+/** Zonele din clasament (culorile vin de pe site-ul ligii, la fel ca locurile) */
+export const ZONES: Record<Zone, { label: string; bar: string; tint: string }> = {
+  promo: { label: 'Promovare directă în Liga II', bar: 'bg-emerald-400', tint: 'bg-emerald-400/[.06]' },
+  promoPlayoff: { label: 'Baraj de promovare în Liga II', bar: 'bg-sky', tint: 'bg-sky/[.06]' },
+  relegPlayoff: { label: 'Baraj de menținere în Liga III', bar: 'bg-amber-400', tint: 'bg-amber-400/[.06]' },
+  releg: { label: 'Retrogradare în Liga IV', bar: 'bg-rose-500', tint: 'bg-rose-500/[.07]' }
+};
 
 /** Clasament Liga III-B — automat din site-ul ligii */
 export const standingsRound: number = auto.round;
-export const standings: Row[] = auto.standings;
+export const standings: Row[] = auto.standings as Row[];
 
 export type Player = { name: string; goals: number; yellow: number; red: number; leagueRank: number | null };
 
@@ -115,7 +128,7 @@ export const squad: Player[] = auto.squad;
 /** Câți jucători au marcat în toată Liga III-B (pentru „locul X din Y”) */
 export const leagueScorersCount: number = auto.leagueScorers;
 
-export type Spotlight = { name: string; role: string; highlight: string; badge: string; link?: string };
+export type Spotlight = { name: string; role: string; highlight: string; badge: string; link?: string; image?: string };
 
 const goalsText = (g: number) => `${g} ${g === 1 ? 'gol' : 'goluri'}`;
 
@@ -125,69 +138,69 @@ export const teamScorerRank = (p: Player) => (p.goals > 0 ? 1 + squad.filter(o =
 /** Golgheterul (golgheterii, la egalitate) echipei — calculat automat din goluri */
 export const topScorers = squad.filter(p => p.goals > 0 && teamScorerRank(p) === 1);
 
-type AwardPost = { name: string; names?: string[]; label?: string | null; date: string; permalink: string | null; opponent: string | null };
+type AwardPost = { name: string; names?: string[]; label?: string | null; date: string; permalink: string | null; opponent: string | null; image?: string | null };
 const ig = instagram as { fanFavorite?: AwardPost; potm?: AwardPost };
 
 /** Rolul afișat sub nume pentru anumiți jucători (în rest se calculează din goluri) */
 const roles: Record<string, string> = { 'Daniel Guma': 'Antrenor-jucător' };
 
 /**
- * Fan Favorite + Player of the Match — AUTOMAT din postările @fc__basarabia
- * (scripts/update-instagram.mjs → instagram-auto.json). Golgheterul vine din goluri.
+ * „Jucători în formă” — un card pe premiu, în ordinea:
+ *   1. MVP (din postarea de Instagram; dacă sunt 2 MVP, apar 2 carduri)
+ *   2. Fan Favorite (din postarea de Instagram)
+ *   3. Golgheterul echipei (calculat din goluri)
+ * Totul se actualizează automat (scripts/update-instagram.mjs + update-league.mjs).
  */
-const awards: { name: string; badge: string; note?: string; link?: string }[] = [
-  ...(ig.fanFavorite?.names ?? (ig.fanFavorite ? [ig.fanFavorite.name] : [])).map(name => ({
-    name,
-    badge: 'Fan Favorite',
-    note: 'ales Fan Favorite de fani',
-    link: ig.fanFavorite?.permalink ?? undefined
-  })),
-  ...(ig.potm?.names ?? (ig.potm ? [ig.potm.name] : [])).map(name => {
-    const label = ig.potm?.label ?? 'Player of the Match';
-    return {
-      name,
-      badge: label,
-      note: ig.potm?.opponent ? `${label} vs ${ig.potm.opponent}` : label,
-      link: ig.potm?.permalink ?? undefined
-    };
-  })
-]
-  .filter((a): a is NonNullable<typeof a> => Boolean(a));
-
-const SPOTLIGHT_CARDS = 4;
-
-function buildSpotlight(): Spotlight[] {
-  const byGoals = [...squad].sort((a, b) => b.goals - a.goals);
-  const picked: Player[] = [];
-  const add = (p?: Player) => p && !picked.includes(p) && picked.length < SPOTLIGHT_CARDS && picked.push(p);
-  topScorers.forEach(add);
-  awards.forEach(a => add(squad.find(p => p.name === a.name)));
-  byGoals.filter(p => p.goals > 0).forEach(add);
-
-  return picked
-    .sort((a, b) => b.goals - a.goals)
-    .map(p => {
-      const mine = awards.filter(a => a.name === p.name); // poate avea ambele premii
-      const rank = teamScorerRank(p);
-      const isTop = rank === 1;
-      const stats = [
-        p.goals > 0 ? `${goalsText(p.goals)} în campionat` : null,
-        p.leagueRank ? `locul ${p.leagueRank} în Liga III-B` : null
-      ].filter(Boolean).join(' · ');
-      const notes = mine.map(a => a.note).filter(Boolean).join(' · ');
-      return {
-        name: p.name,
-        role: isTop ? 'Golgheterul echipei' : roles[p.name] ?? (rank ? `Locul ${rank} la marcatori` : 'Jucător'),
-        highlight: [stats, notes].filter(Boolean).join(' · '),
-        badge: mine.length
-          ? mine.map(a => (mine.length > 1 && a.badge === 'Player of the Match' ? 'POTM' : a.badge)).join(' · ')
-          : isTop ? 'Golgheter' : 'Marcator',
-        link: mine.find(a => a.link)?.link
-      };
-    });
+function playerStats(p?: Player) {
+  if (!p) return '';
+  return [p.goals > 0 ? `${goalsText(p.goals)} în campionat` : null, p.leagueRank ? `locul ${p.leagueRank} în Liga III-B` : null]
+    .filter(Boolean)
+    .join(' · ');
 }
 
-/** Cardurile „Jucători în formă” — se reordonează singure după goluri */
+function buildSpotlight(): Spotlight[] {
+  const find = (name: string) => squad.find(p => p.name === name);
+  const cards: Spotlight[] = [];
+
+  const mvps = (ig.potm?.names ?? (ig.potm ? [ig.potm.name] : [])).slice(0, 2);
+  for (const name of mvps) {
+    const vs = ig.potm?.opponent ? `MVP vs ${ig.potm.opponent}` : 'MVP-ul meciului';
+    cards.push({
+      name,
+      badge: 'MVP',
+      role: roles[name] ?? 'MVP-ul meciului',
+      highlight: [vs, playerStats(find(name))].filter(Boolean).join(' · '),
+      link: ig.potm?.permalink ?? undefined,
+      image: ig.potm?.image ?? undefined
+    });
+  }
+
+  const fan = ig.fanFavorite?.names?.[0] ?? ig.fanFavorite?.name;
+  if (fan) {
+    cards.push({
+      name: fan,
+      badge: 'Fan Favorite',
+      role: roles[fan] ?? 'Ales de fani',
+      highlight: ['Votat Fan Favorite de suporteri', playerStats(find(fan))].filter(Boolean).join(' · '),
+      link: ig.fanFavorite?.permalink ?? undefined,
+      image: ig.fanFavorite?.image ?? undefined
+    });
+  }
+
+  const top = topScorers[0];
+  if (top) {
+    const tied = topScorers.length > 1 ? ` (la egalitate cu ${topScorers.slice(1).map(p => p.name).join(', ')})` : '';
+    cards.push({
+      name: top.name,
+      badge: 'Golgheter',
+      role: 'Golgheterul echipei',
+      highlight: playerStats(top) + tied
+    });
+  }
+
+  return cards;
+}
+
 export const spotlightPlayers: Spotlight[] = buildSpotlight();
 
 export const sponsors = [{ name: 'Banu Sport', note: 'Partener oficial' }];

@@ -52,10 +52,22 @@ const teamName = raw => {
   return key.toLowerCase().replace(/(^|\s)\S/g, c => c.toUpperCase());
 };
 
+/** Descarcă o pagină; reîncearcă de 3 ori dacă site-ul ligii răspunde cu eroare sau cu o pagină incompletă */
 async function get(url) {
-  const res = await fetch(encodeURI(url), { headers: { 'user-agent': 'fc-basarabia-site (actualizare clasament)' } });
-  if (!res.ok) throw new Error(`${url} → HTTP ${res.status}`);
-  return res.text();
+  let last;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const res = await fetch(encodeURI(url), { headers: { 'user-agent': 'fc-basarabia-site (actualizare clasament)' } });
+      if (!res.ok) throw new Error(`${url} → HTTP ${res.status}`);
+      const html = await res.text();
+      if (!html.includes('id="mainContent"')) throw new Error(`${url} → pagină incompletă`);
+      return html;
+    } catch (e) {
+      last = e;
+      await new Promise(r => setTimeout(r, 2000 * attempt));
+    }
+  }
+  throw last;
 }
 
 const mainContent = html => {
@@ -66,16 +78,27 @@ const mainContent = html => {
 
 const cells = rowHtml => [...rowHtml.matchAll(/<td[^>]*>([\s\S]*?)<\/td>/g)].map(m => m[1]);
 
+/**
+ * Zona din clasament, după culoarea rândului de pe site-ul ligii:
+ * portocaliu = promovare directă, portocaliu deschis = baraj de promovare,
+ * verde deschis = baraj de menținere, verde = retrogradare.
+ */
+const ZONE_COLORS = { 'ff9900': 'promo', 'ffc65b': 'promoPlayoff', 'bfffd2': 'relegPlayoff', '99cc99': 'releg' };
+const zoneOf = trHtml => {
+  const c = trHtml.match(/background:\s*#([0-9a-f]{6})/i)?.[1]?.toLowerCase();
+  return ZONE_COLORS[c] ?? null;
+};
+
 function parseStandings(html) {
   const body = mainContent(html);
   const table = body.slice(0, body.indexOf('</table>'));
   const rows = [];
-  for (const [, tr] of table.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/g)) {
+  for (const [, open, tr] of table.matchAll(/(<tr[^>]*>)([\s\S]*?)<\/tr>/g)) {
     const c = cells(tr);
     if (c.length < 9) continue;
     const [pos, team, p, w, d, l, gf, ga, pts] = [c[0], c[1], ...c.slice(2, 9)].map((v, i) => (i === 1 ? teamName(v) : Number(clean(v))));
     if ([pos, p, w, d, l, gf, ga, pts].some(n => !Number.isFinite(n))) throw new Error(`Rând de clasament invalid: ${clean(tr)}`);
-    rows.push({ team, p, w, d, l, gf, ga, pts });
+    rows.push({ team, p, w, d, l, gf, ga, pts, zone: zoneOf(open) });
   }
   if (rows.length < 4) throw new Error(`Clasament prea scurt (${rows.length} rânduri)`);
   return rows;

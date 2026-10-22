@@ -25,7 +25,8 @@ const team = {
   coach: { '@type': 'Person', name: club.coach },
   athlete: squad.map(p => ({ '@type': 'Person', name: p.name })),
   location: place,
-  sameAs: [club.instagram, club.formular230],
+  sameAs: [club.instagram, club.facebook, club.youtube, club.formular230],
+    email: club.email,
   sponsor: { '@type': 'Organization', name: 'Banu Sport' }
 };
 
