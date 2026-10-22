@@ -1,6 +1,6 @@
 # Actualizează automat site-ul:
 #   • clasament / rezultate / program / goluri jucători  ← alborzminifotbal.ro
-#   • Fan Favorite / Player of the Match                ← postările @fc__basarabia (Instagram)
+#   • MVP / Fan Favorite (+ poza postării)              ← postările @fc__basarabia (Instagram)
 # Dacă s-a schimbat ceva, face commit → Vercel republică site-ul singur.
 name: Actualizare site
 
@@ -38,7 +38,7 @@ jobs:
         working-directory: ${{ env.APP_DIR }}
         run: node scripts/update-league.mjs
 
-      - name: Instagram — Fan Favorite / Player of the Match
+      - name: Instagram — MVP / Fan Favorite
         id: ig
         continue-on-error: true
         working-directory: ${{ env.APP_DIR }}
@@ -50,13 +50,14 @@ jobs:
       - name: Commit dacă s-a schimbat ceva
         working-directory: ${{ env.APP_DIR }}
         run: |
-          if git diff --quiet -- src/data/league-auto.json src/data/instagram-auto.json; then
+          git add -A src/data/league-auto.json src/data/instagram-auto.json
+          if [ -d public/instagram ] || git ls-files --error-unmatch public/instagram >/dev/null 2>&1; then git add -A public/instagram; fi
+          if git diff --cached --quiet; then
             echo "Nicio schimbare."
             exit 0
           fi
           git config user.name  "fc-basarabia-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src/data/league-auto.json src/data/instagram-auto.json
           git commit -m "Date actualizate automat (ligă / Instagram)"
           git push
           echo "changed=1" >> "$GITHUB_ENV"
