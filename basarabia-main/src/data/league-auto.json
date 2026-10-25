@@ -1,26 +1,37 @@
 {
   "source": "https://www.alborzminifotbal.ro/clasament-liga-III-B.html",
-  "round": 9,
+  "round": 10,
   "standings": [
     {
       "team": "Athletic",
-      "p": 9,
-      "w": 7,
+      "p": 10,
+      "w": 8,
       "d": 1,
       "l": 1,
-      "gf": 38,
-      "ga": 17,
-      "pts": 22,
+      "gf": 42,
+      "ga": 18,
+      "pts": 25,
       "zone": "promo"
     },
     {
       "team": "AS FC Real Timișoara",
-      "p": 9,
+      "p": 10,
       "w": 7,
       "d": 0,
-      "l": 2,
-      "gf": 50,
-      "ga": 29,
+      "l": 3,
+      "gf": 51,
+      "ga": 33,
+      "pts": 21,
+      "zone": "promo"
+    },
+    {
+      "team": "UCECOM",
+      "p": 10,
+      "w": 7,
+      "d": 0,
+      "l": 3,
+      "gf": 30,
+      "ga": 22,
       "pts": 21,
       "zone": "promo"
     },
@@ -33,17 +44,6 @@
       "gf": 37,
       "ga": 24,
       "pts": 19,
-      "zone": "promo"
-    },
-    {
-      "team": "UCECOM",
-      "p": 9,
-      "w": 6,
-      "d": 0,
-      "l": 3,
-      "gf": 27,
-      "ga": 21,
-      "pts": 18,
       "zone": "promoPlayoff"
     },
     {
@@ -147,12 +147,12 @@
     },
     {
       "team": "TMT",
-      "p": 9,
+      "p": 10,
       "w": 1,
       "d": 2,
-      "l": 6,
-      "gf": 20,
-      "ga": 38,
+      "l": 7,
+      "gf": 21,
+      "ga": 41,
       "pts": 5,
       "zone": "releg"
     },
@@ -834,8 +834,8 @@
       "kickoff": "2026-10-25T14:00:00+02:00",
       "home": "Athletic",
       "away": "AS FC Real Timișoara",
-      "hg": null,
-      "ag": null
+      "hg": 4,
+      "ag": 1
     },
     {
       "round": 10,
@@ -843,8 +843,8 @@
       "kickoff": "2026-10-25T15:00:00+02:00",
       "home": "TMT",
       "away": "UCECOM",
-      "hg": null,
-      "ag": null
+      "hg": 1,
+      "ag": 3
     },
     {
       "round": 10,
@@ -1267,70 +1267,70 @@
       "goals": 7,
       "yellow": 0,
       "red": 0,
-      "leagueRank": 14
+      "leagueRank": 15
     },
     {
       "name": "Viorel Ciugureanu",
       "goals": 6,
       "yellow": 0,
       "red": 0,
-      "leagueRank": 17
+      "leagueRank": 18
     },
     {
       "name": "Andrei Cebotari",
       "goals": 5,
       "yellow": 1,
       "red": 0,
-      "leagueRank": 24
+      "leagueRank": 25
     },
     {
       "name": "Virgiliu Bubulici",
       "goals": 3,
       "yellow": 1,
       "red": 0,
-      "leagueRank": 39
+      "leagueRank": 40
     },
     {
       "name": "Daniel Guma",
       "goals": 2,
       "yellow": 0,
       "red": 0,
-      "leagueRank": 52
+      "leagueRank": 53
     },
     {
       "name": "Alexei Chirpii",
       "goals": 1,
       "yellow": 0,
       "red": 0,
-      "leagueRank": 86
+      "leagueRank": 88
     },
     {
       "name": "Ghenadii Rudei",
       "goals": 1,
       "yellow": 0,
       "red": 1,
-      "leagueRank": 86
+      "leagueRank": 88
     },
     {
       "name": "Marin Podelniuc",
       "goals": 1,
       "yellow": 0,
       "red": 0,
-      "leagueRank": 86
+      "leagueRank": 88
     },
     {
       "name": "Nicolae Prisac",
       "goals": 1,
       "yellow": 0,
       "red": 0,
-      "leagueRank": 86
+      "leagueRank": 88
     },
     {
       "name": "Teodor Negru",
       "goals": 1,
       "yellow": 0,
       "red": 0,
-      "leagueRank": 86
+      "leagueRank": 88
     },
     {
       "name": "Andrei Roga",
@@ -1389,7 +1389,7 @@
       "leagueRank": null
     }
   ],
-  "leagueScorers": 140,
+  "leagueScorers": 141,
   "goalSnapshots": {
     "9": {
       "Danu Garbuz": 7,
