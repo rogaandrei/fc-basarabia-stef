@@ -21,7 +21,7 @@ export const club = {
   sport: 'Minifotbal',
   kit: 'Gri / Albastru',
   coach: 'Daniel Guma',
-  delegates: ['Daniel Guma', 'Stefan Cocirlan'],
+  delegates: ['Daniel Guma', 'Stefan Ciocirlan'],
   ground: {
     name: 'Baza sportivă Calea Buziașului',
     street: 'Calea Buziașului 9E',
@@ -125,6 +125,33 @@ export type Player = { name: string; goals: number; yellow: number; red: number;
 
 /** Lotul legitimat + goluri/cartonașe — automat din pagina echipei pe site-ul ligii */
 export const squad: Player[] = auto.squad;
+/**
+ * Poziția pe teren — se completează de mână.
+ * Poziții: Portar, Fundaș, Mijlocaș, Atacant (sau orice text vrei).
+ * Ex: 'Danu Garbuz': { position: 'Atacant' },
+ */
+export type PlayerDetails = { position?: string };
+export const playerDetails: Record<string, PlayerDetails> = {
+  'Danu Garbuz': { position: 'Atacant' },
+  'Viorel Ciugureanu': { position: 'Atacant' },
+  'Andrei Cebotari': { position: 'Mijlocaș' },
+  'Virgiliu Bubulici': { position: 'Mijlocaș' },
+  'Daniel Guma': { position: 'Mijlocaș' },
+  'Ghenadii Rudei': { position: 'Atacant' },
+  'Nicolae Prisac': { position: 'Atacant' },
+  'Alexei Chirpii': { position: 'Atacant' },
+  'Marin Podelniuc': { position: 'Fundaș' },
+  'Nicu Zaporojan': { position: 'Mijlocaș' },
+  'Teodor Negru': { position: 'Atacant' },
+  'Andrei Roga': { position: 'Fundaș' },
+  'Denis Bandol': { position: 'Fundaș' },
+  'Flavius Alexandru Vacarita': { position: 'Atacant' },
+  'Ion Mocanu': { position: 'Portar' },
+  'Laurentiu Stici': { position: 'Fundaș' },
+  'Sergiu Andronic': { position: 'Portar' },
+  'Sergiu Dohotaru': { position: 'Fundaș' },
+};
+
 /** Câți jucători au marcat în toată Liga III-B (pentru „locul X din Y”) */
 export const leagueScorersCount: number = auto.leagueScorers;
 
@@ -203,7 +230,10 @@ function buildSpotlight(): Spotlight[] {
 
 export const spotlightPlayers: Spotlight[] = buildSpotlight();
 
-export const sponsors = [{ name: 'Banu Sport', note: 'Partener oficial' }];
+export type Sponsor = { name: string; note: string; url?: string; logo?: string };
+export const sponsors: Sponsor[] = [
+  { name: 'Banu Sport', note: 'Partener oficial', url: 'https://www.banusport.ro/', logo: '/sponsors/banu-sport.webp' }
+];
 
 export function isOurs(team: string) {
   return team === club.name;

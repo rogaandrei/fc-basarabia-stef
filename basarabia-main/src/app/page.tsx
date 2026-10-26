@@ -5,6 +5,8 @@ import Crest from '@/components/Crest';
 import JsonLd from '@/components/JsonLd';
 import StandingsTable from '@/components/StandingsTable';
 import SquadList from '@/components/SquadList';
+import CalendarSubscribe from '@/components/CalendarSubscribe';
+import { googleLink, matchSlug } from '@/lib/calendar';
 import { readdirSync } from 'node:fs';
 import path from 'node:path';
 import SplitText from '@/components/reactbits/SplitText';
@@ -14,7 +16,7 @@ import ScrollVelocity from '@/components/reactbits/ScrollVelocity';
 import SpotlightCard from '@/components/reactbits/SpotlightCard';
 import Magnet from '@/components/reactbits/Magnet';
 import GradientText from '@/components/reactbits/GradientText';
-import { club, fixtures, results, standingsRound, squad, spotlightPlayers, sponsors, outcome, isOurs, ourRow, ourPosition, fmt } from '@/data/club';
+import { SITE_URL, club, fixtures, results, standingsRound, squad, spotlightPlayers, sponsors, outcome, isOurs, ourRow, ourPosition, fmt } from '@/data/club';
 
 const BUILD_TIME = Date.now();
 /**
@@ -230,7 +232,7 @@ export default function Home() {
                 { label: 'Goluri marcate', sr: String(ourRow.gf), value: <CountUp to={ourRow.gf} duration={1.6} /> },
                 { label: 'Victorii · Egaluri · Înfrângeri', sr: `${ourRow.w}-${ourRow.d}-${ourRow.l}`, value: <>{ourRow.w}<span className="text-sky">·</span>{ourRow.d}<span className="text-sky">·</span>{ourRow.l}</> }
               ].map(s => (
-                <div key={s.label} className="flex flex-col-reverse gap-2 bg-navy-950 p-6 sm:p-10">
+                <div key={s.label} className="flex flex-col-reverse justify-end gap-2 bg-navy-950 p-6 sm:p-10">
                   <dt className="text-xs font-bold uppercase tracking-[.2em] text-muted">{s.label}</dt>
                   <dd className="display text-5xl text-white sm:text-6xl">
                     <span aria-hidden="true">{s.value}</span>
@@ -250,6 +252,7 @@ export default function Home() {
                 Toate meciurile se joacă pe {club.ground.street}, {club.ground.city}. Vino cu prietenii și susține echipa!
               </p>
             </SectionHead>
+            <CalendarSubscribe fallbackHost={SITE_URL.replace(/^https?:\/\//, '')} />
             <ol className="divide-y divide-white/10 overflow-hidden rounded-3xl ring-1 ring-white/10">
               {upcoming.map((f, i) => (
                 <li
@@ -269,9 +272,28 @@ export default function Home() {
                       Etapa {f.round} · <span className="capitalize">{fmt.long(f.date)}</span> · ora {fmt.time(f.date)}
                     </p>
                   </div>
-                  <span className={`col-span-2 justify-self-start rounded-full px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest ring-1 sm:col-span-1 sm:justify-self-end ${isOurs(f.home) ? 'bg-white/10 text-white ring-white/20' : 'text-sky ring-sky/30'}`}>
-                    {isOurs(f.home) ? 'Gazde' : 'Oaspeți'}
-                  </span>
+                  <div className="col-span-2 flex flex-wrap items-center gap-2 sm:col-span-1 sm:justify-end">
+                    <span className={`rounded-full px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest ring-1 ${isOurs(f.home) ? 'bg-white/10 text-white ring-white/20' : 'text-sky ring-sky/30'}`}>
+                      {isOurs(f.home) ? 'Gazde' : 'Oaspeți'}
+                    </span>
+                    <details className="group relative">
+                      <summary className="flex cursor-pointer list-none items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest text-sky ring-1 ring-sky/30 transition hover:bg-sky/10 [&::-webkit-details-marker]:hidden">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+                          <rect x="3" y="4.5" width="18" height="16" rx="3" />
+                          <path d="M3 9.5h18M8 2.5v4M16 2.5v4" />
+                        </svg>
+                        În calendar
+                      </summary>
+                      <div className="absolute right-0 z-20 mt-2 w-48 overflow-hidden rounded-2xl bg-navy-800 text-sm shadow-xl ring-1 ring-white/15 max-sm:left-0 max-sm:right-auto">
+                        <a href={googleLink(f)} target="_blank" rel="noopener noreferrer" className="block px-4 py-2.5 text-white hover:bg-brand">
+                          Google Calendar
+                        </a>
+                        <a href={`/calendar/${matchSlug(f)}.ics`} download={`fc-basarabia-${matchSlug(f)}.ics`} className="block px-4 py-2.5 text-white hover:bg-brand">
+                          Apple / Outlook (.ics)
+                        </a>
+                      </div>
+                    </details>
+                  </div>
                 </li>
               ))}
               <li className="bg-navy-900/30 p-5 text-center text-sm text-muted sm:p-6">
@@ -515,9 +537,21 @@ export default function Home() {
               <p className="section-kicker text-center">Cu sprijinul</p>
               <ul className="mt-6 flex flex-wrap items-center justify-center gap-4">
                 {sponsors.map(s => (
-                  <li key={s.name} className="rounded-2xl bg-white/[.04] px-8 py-5 text-center ring-1 ring-white/10">
-                    <span className="display block text-4xl tracking-wide text-white">{s.name}</span>
-                    <span className="text-[10px] font-bold uppercase tracking-[.2em] text-muted">{s.note}</span>
+                  <li key={s.name}>
+                    <a
+                      href={s.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group flex flex-col items-center gap-1 rounded-2xl bg-white/[.04] px-8 py-5 text-center ring-1 ring-white/10 transition hover:bg-white/[.07] hover:ring-sky/50"
+                    >
+                      {s.logo ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={s.logo} alt={s.name} width={192} height={67} loading="lazy" className="h-9 w-auto transition group-hover:scale-105" />
+                      ) : (
+                        <span className="display block text-4xl tracking-wide text-white">{s.name}</span>
+                      )}
+                      <span className="text-[10px] font-bold uppercase tracking-[.2em] text-muted group-hover:text-sky">{s.note}</span>
+                    </a>
                   </li>
                 ))}
                 <li>
@@ -572,7 +606,7 @@ export default function Home() {
                 <span className="break-all">{club.email}</span> — parteneriate, presă, sponsorizări.
               </ContactCard>
               <ContactCard className="lg:col-span-2" href={club.instagram} icon={<InstagramIcon size={28} />} title="Instagram" cta="Urmărește-ne →">
-                {club.instagramHandle} — noutăți, matchday și votul pentru Fan Favorite.
+                {club.instagramHandle} — noutăți, poze și culise de la fiecare meci.
               </ContactCard>
               <ContactCard className="lg:col-span-2" href={club.facebook} icon={<FacebookIcon size={28} />} title="Facebook" cta="Dă like paginii →">
                 FC Basarabia pe Facebook — anunțuri, poze și evenimentele comunității.
@@ -655,7 +689,7 @@ function ContactCard({
   cta: string;
   external?: boolean;
   className?: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }) {
   return (
     <a
@@ -665,7 +699,7 @@ function ContactCard({
     >
       {icon}
       <h3 className="display mt-4 text-3xl text-white">{title}</h3>
-      <div className="mt-2 text-muted">{children}</div>
+      {children && <div className="mt-2 text-muted">{children}</div>}
       <span className="mt-auto pt-4 text-sm font-semibold text-sky group-hover:text-white">{cta}</span>
     </a>
   );

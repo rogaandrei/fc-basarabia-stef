@@ -27,7 +27,7 @@ const team = {
   location: place,
   sameAs: [club.instagram, club.facebook, club.youtube, club.formular230],
     email: club.email,
-  sponsor: { '@type': 'Organization', name: 'Banu Sport' }
+  sponsor: { '@type': 'Organization', name: 'Banu Sport', url: 'https://www.banusport.ro/' }
 };
 
 const toEvent = (e: { date: string; home: string; away: string }, extra: Record<string, unknown> = {}) => ({

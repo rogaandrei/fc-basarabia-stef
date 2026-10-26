@@ -1,7 +1,13 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { leagueScorersCount, type Player, type Result } from '@/data/club';
+import { leagueScorersCount, playerDetails, type Player, type Result } from '@/data/club';
+
+/** „Danu Garbuz” → „Garbuz Danu” (numele de familie primul) */
+const surnameFirst = (name: string) => {
+  const w = name.split(' ');
+  return [w[w.length - 1], ...w.slice(0, -1)].join(' ');
+};
 
 const initials = (name: string) =>
   name
@@ -39,6 +45,7 @@ export default function SquadList({
     if (!active && d.open) d.close();
   }, [active]);
 
+  const info = (active && playerDetails[active.name]) || {};
   const teamGoals = squad.reduce((n, p) => n + p.goals, 0);
   const scorersRank = [...squad].sort((a, b) => b.goals - a.goals);
 
@@ -53,7 +60,7 @@ export default function SquadList({
   return (
     <>
       <ul className="grid grid-cols-1 gap-px overflow-hidden rounded-3xl bg-white/10 sm:grid-cols-2 lg:grid-cols-3">
-        {squad.map(p => (
+        {[...squad].sort((a, b) => surnameFirst(a.name).localeCompare(surnameFirst(b.name), 'ro')).map(p => (
           <li key={p.name} className="bg-navy-950">
             <button
               type="button"
@@ -79,8 +86,10 @@ export default function SquadList({
                 </span>
               )}
               <span className="min-w-0 flex-1">
-                <span className="block truncate font-semibold text-white">{p.name}</span>
-                <span className="block text-xs text-muted transition-colors group-hover:text-sky">Vezi statistici</span>
+                <span className="block truncate font-semibold text-white">{surnameFirst(p.name)}</span>
+                <span className="block text-xs text-muted transition-colors group-hover:text-sky">
+                  {playerDetails[p.name]?.position ?? 'Vezi statistici'}
+                </span>
               </span>
               <svg aria-hidden="true" viewBox="0 0 20 20" className="h-4 w-4 shrink-0 text-white/30 transition group-hover:translate-x-0.5 group-hover:text-sky" fill="currentColor">
                 <path fillRule="evenodd" d="M7.2 14.8a.75.75 0 0 1 0-1.06L10.94 10 7.2 6.26a.75.75 0 1 1 1.06-1.06l4.27 4.27a.75.75 0 0 1 0 1.06L8.26 14.8a.75.75 0 0 1-1.06 0Z" clipRule="evenodd" />
@@ -105,8 +114,8 @@ export default function SquadList({
                 <img src={photos[active.name]} alt={`Fotografie ${active.name}`} className="absolute inset-0 h-full w-full object-cover object-top" />
                 <div className="absolute inset-0 bg-gradient-to-t from-navy-900 via-navy-900/20 to-transparent" aria-hidden="true" />
                 <div className="absolute inset-x-0 bottom-0 px-6 pb-5">
-                  <p className="text-[10px] font-bold uppercase tracking-[.2em] text-sky">FC Basarabia · Lot legitimat</p>
-                  <h3 id="player-dialog-title" className="display mt-2 text-4xl leading-none drop-shadow-lg">{active.name}</h3>
+                  <p className="text-[10px] font-bold uppercase tracking-[.2em] text-sky">{info.position ?? 'FC Basarabia · Lot legitimat'}</p>
+                  <h3 id="player-dialog-title" className="display mt-2 text-4xl leading-none drop-shadow-lg">{surnameFirst(active.name)}</h3>
                 </div>
               </div>
             ) : (
@@ -114,8 +123,8 @@ export default function SquadList({
                 <span aria-hidden="true" className="display absolute -right-3 -top-8 text-[9rem] leading-none text-white/10">
                   {initials(active.name)}
                 </span>
-                <p className="text-[10px] font-bold uppercase tracking-[.2em] text-sky">FC Basarabia · Lot legitimat</p>
-                <h3 id="player-dialog-title" className="display mt-2 text-4xl leading-none">{active.name}</h3>
+                <p className="text-[10px] font-bold uppercase tracking-[.2em] text-sky">{info.position ?? 'FC Basarabia · Lot legitimat'}</p>
+                <h3 id="player-dialog-title" className="display mt-2 text-4xl leading-none">{surnameFirst(active.name)}</h3>
               </div>
             )}
               <button
