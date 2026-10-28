@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { leagueScorersCount, playerDetails, type Player, type Result } from '@/data/club';
+import { leagueScorersCount, type Player, type Result } from '@/data/club';
+import { t, LOCALE, goalsWord, type Lang } from '@/i18n/dict';
 
 /** „Danu Garbuz” → „Garbuz Danu” (numele de familie primul) */
 const surnameFirst = (name: string) => {
@@ -28,13 +29,20 @@ function goalsInMatch(scorers: string[] | undefined, name: string) {
 export default function SquadList({
   squad,
   results,
-  photos = {}
+  photos = {},
+  positions = {},
+  lang = 'ro'
 }: {
   squad: Player[];
   results: Result[];
   /** numele jucătorului → calea pozei din /public/players (dacă există) */
   photos?: Record<string, string>;
+  /** numele jucătorului → poziția, deja tradusă */
+  positions?: Record<string, string>;
+  lang?: Lang;
 }) {
+  const d = t(lang);
+  const Q = d.squad;
   const [active, setActive] = useState<Player | null>(null);
   const dialog = useRef<HTMLDialogElement>(null);
 
@@ -45,7 +53,7 @@ export default function SquadList({
     if (!active && d.open) d.close();
   }, [active]);
 
-  const info = (active && playerDetails[active.name]) || {};
+  const pos = active ? positions[active.name] || null : null;
   const teamGoals = squad.reduce((n, p) => n + p.goals, 0);
   const scorersRank = [...squad].sort((a, b) => b.goals - a.goals);
 
@@ -60,7 +68,7 @@ export default function SquadList({
   return (
     <>
       <ul className="grid grid-cols-1 gap-px overflow-hidden rounded-3xl bg-white/10 sm:grid-cols-2 lg:grid-cols-3">
-        {[...squad].sort((a, b) => surnameFirst(a.name).localeCompare(surnameFirst(b.name), 'ro')).map(p => (
+        {[...squad].sort((a, b) => surnameFirst(a.name).localeCompare(surnameFirst(b.name), LOCALE[lang])).map(p => (
           <li key={p.name} className="bg-navy-950">
             <button
               type="button"
@@ -88,7 +96,7 @@ export default function SquadList({
               <span className="min-w-0 flex-1">
                 <span className="block truncate font-semibold text-white">{surnameFirst(p.name)}</span>
                 <span className="block text-xs text-muted transition-colors group-hover:text-sky">
-                  {playerDetails[p.name]?.position ?? 'Vezi statistici'}
+                  {positions[p.name] || Q.viewStats}
                 </span>
               </span>
               <svg aria-hidden="true" viewBox="0 0 20 20" className="h-4 w-4 shrink-0 text-white/30 transition group-hover:translate-x-0.5 group-hover:text-sky" fill="currentColor">
@@ -111,10 +119,10 @@ export default function SquadList({
             {photos[active.name] ? (
               <div className="relative aspect-[4/3] overflow-hidden bg-navy-800">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={photos[active.name]} alt={`Fotografie ${active.name}`} className="absolute inset-0 h-full w-full object-cover object-top" />
+                <img src={photos[active.name]} alt={Q.photo(surnameFirst(active.name))} className="absolute inset-0 h-full w-full object-cover object-top" />
                 <div className="absolute inset-0 bg-gradient-to-t from-navy-900 via-navy-900/20 to-transparent" aria-hidden="true" />
                 <div className="absolute inset-x-0 bottom-0 px-6 pb-5">
-                  <p className="text-[10px] font-bold uppercase tracking-[.2em] text-sky">{info.position ?? 'FC Basarabia · Lot legitimat'}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[.2em] text-sky">{pos ?? Q.registered}</p>
                   <h3 id="player-dialog-title" className="display mt-2 text-4xl leading-none drop-shadow-lg">{surnameFirst(active.name)}</h3>
                 </div>
               </div>
@@ -123,14 +131,14 @@ export default function SquadList({
                 <span aria-hidden="true" className="display absolute -right-3 -top-8 text-[9rem] leading-none text-white/10">
                   {initials(active.name)}
                 </span>
-                <p className="text-[10px] font-bold uppercase tracking-[.2em] text-sky">{info.position ?? 'FC Basarabia · Lot legitimat'}</p>
+                <p className="text-[10px] font-bold uppercase tracking-[.2em] text-sky">{pos ?? Q.registered}</p>
                 <h3 id="player-dialog-title" className="display mt-2 text-4xl leading-none">{surnameFirst(active.name)}</h3>
               </div>
             )}
               <button
                 type="button"
                 onClick={() => setActive(null)}
-                aria-label="Închide"
+                aria-label={Q.close}
                 className="absolute right-4 top-4 z-10 grid h-9 w-9 place-items-center rounded-full bg-navy-950/40 text-white/80 ring-1 ring-white/15 transition hover:bg-navy-950/70 hover:text-white"
               >
                 <svg viewBox="0 0 20 20" className="h-4 w-4" fill="currentColor" aria-hidden="true">
@@ -140,9 +148,9 @@ export default function SquadList({
 
             <dl className="grid grid-cols-3 gap-px bg-white/10">
               {[
-                { k: 'Goluri', v: active.goals, accent: 'text-white' },
-                { k: 'Galbene', v: active.yellow, accent: 'text-yellow-300' },
-                { k: 'Roșii', v: active.red, accent: 'text-red-400' }
+                { k: Q.stat.goals, v: active.goals, accent: 'text-white' },
+                { k: Q.stat.yellow, v: active.yellow, accent: 'text-yellow-300' },
+                { k: Q.stat.red, v: active.red, accent: 'text-red-400' }
               ].map(s => (
                 <div key={s.k} className="bg-navy-900 px-4 py-5 text-center">
                   <dd className={`display text-5xl leading-none ${s.accent}`}>{s.v}</dd>
@@ -154,39 +162,33 @@ export default function SquadList({
             <div className="space-y-4 px-6 py-6 text-sm">
               {active.goals > 0 ? (
                 <ul className="space-y-1.5 text-muted">
-                  <li>
-                    Locul <strong className="text-white">{rank}</strong> în topul marcatorilor echipei ·{' '}
-                    <strong className="text-white">{share}%</strong> din golurile noastre
-                  </li>
+                  <li>{Q.teamRank(rank, share)}</li>
                   {active.leagueRank && (
-                    <li>
-                      Locul <strong className="text-white">{active.leagueRank}</strong> din {leagueScorersCount} marcatori în
-                      golgheterii Liga III-B
-                    </li>
+                    <li>{Q.leagueRank(active.leagueRank, leagueScorersCount, d.league)}</li>
                   )}
                 </ul>
               ) : (
-                <p className="text-muted">Încă fără gol în acest sezon — vine și primul!</p>
+                <p className="text-muted">{Q.noGoals}</p>
               )}
 
               {matches.length > 0 && (
                 <div>
-                  <p className="mb-2 text-[10px] font-bold uppercase tracking-[.18em] text-sky">A marcat în</p>
+                  <p className="mb-2 text-[10px] font-bold uppercase tracking-[.18em] text-sky">{Q.scoredIn}</p>
                   <ul className="divide-y divide-white/5 rounded-2xl bg-white/[.03] ring-1 ring-white/10">
                     {matches.map(({ r, g }) => (
                       <li key={r.round} className="flex items-center justify-between gap-3 px-4 py-2.5">
                         <span className="min-w-0 truncate">
-                          <span className="text-muted">Et. {r.round} · </span>
+                          <span className="text-muted">{Q.roundShort(r.round)}</span>
                           {r.home} <span className="font-semibold tabular-nums">{r.homeGoals}–{r.awayGoals}</span> {r.away}
                         </span>
                         <span className="shrink-0 rounded-md bg-brand px-2 py-0.5 text-xs font-bold">
-                          {g} {g === 1 ? 'gol' : 'goluri'}
+                          {goalsWord(lang, g)}
                         </span>
                       </li>
                     ))}
                   </ul>
                   {matches.reduce((n, x) => n + x.g, 0) < active.goals && (
-                    <p className="mt-2 text-xs text-muted/70">Marcatorii pe meci sunt trecuți doar pentru unele etape.</p>
+                    <p className="mt-2 text-xs text-muted/70">{Q.partial}</p>
                   )}
                 </div>
               )}

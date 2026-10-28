@@ -147,10 +147,16 @@ function parseProgram(html) {
 }
 
 /** „GARBUZ DANU” → „Danu Garbuz” (pe site-ul ligii numele de familie e primul) */
+/** Corecturi pentru numele scrise altfel pe site-ul ligii: „cum apare la ligă” → „cum vrem pe site” */
+const NAME_FIX = {
+  'Ghenadii Rudei': 'Ghenadie Rudei'
+};
+
 const personName = raw => {
   const words = clean(raw).toLowerCase().split(' ').filter(Boolean)
     .map(w => w.replace(/(^|-)\S/g, c => c.toUpperCase()));
-  return [...words.slice(1), words[0]].join(' ');
+  const name = [...words.slice(1), words[0]].join(' ');
+  return NAME_FIX[name] ?? name;
 };
 
 function parseScorers(html) {

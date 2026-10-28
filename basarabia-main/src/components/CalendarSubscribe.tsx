@@ -1,9 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { t, type Lang } from '@/i18n/dict';
 
 /** Butoanele de abonare la calendarul meciurilor (se actualizează singur în telefon / Google) */
-export default function CalendarSubscribe({ fallbackHost }: { fallbackHost: string }) {
+export default function CalendarSubscribe({ fallbackHost, lang = 'ro' }: { fallbackHost: string; lang?: Lang }) {
+  const d = t(lang).calendar;
   const [host, setHost] = useState(fallbackHost);
   useEffect(() => setHost(window.location.host), []);
 
@@ -16,7 +18,7 @@ export default function CalendarSubscribe({ fallbackHost }: { fallbackHost: stri
       label: 'Outlook',
       href: `https://outlook.live.com/calendar/0/addfromweb?url=${encodeURIComponent(https)}&name=${encodeURIComponent('FC Basarabia')}`
     },
-    { label: 'Descarcă .ics', href: '/calendar.ics', download: true }
+    { label: d.download, href: '/calendar.ics', download: true }
   ];
 
   return (
@@ -29,11 +31,8 @@ export default function CalendarSubscribe({ fallbackHost }: { fallbackHost: stri
           </svg>
         </span>
         <div>
-          <h3 className="display text-2xl text-white sm:text-3xl">Meciurile în calendarul tău</h3>
-          <p className="mt-1 max-w-md text-sm text-muted">
-            Abonează-te o dată și toate meciurile FC Basarabia apar singure în calendar, cu reminder cu 2 ore înainte. Dacă se
-            schimbă programul, se actualizează automat.
-          </p>
+          <h3 className="display text-2xl text-white sm:text-3xl">{d.title}</h3>
+          <p className="mt-1 max-w-md text-sm text-muted">{d.text}</p>
         </div>
       </div>
       <ul className="flex flex-wrap gap-2">

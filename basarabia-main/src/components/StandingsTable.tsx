@@ -2,7 +2,8 @@
 
 /* eslint-disable @next/next/no-img-element */
 import { useCallback, useEffect, useState } from 'react';
-import { club, standings, standingsRound, isOurs, ZONES, type Zone } from '@/data/club';
+import { standings, standingsRound, isOurs, ZONES, type Zone } from '@/data/club';
+import { t, LOCALE, type Lang } from '@/i18n/dict';
 import { lastForm, type FormItem, type LeagueMatch } from '@/data/league';
 
 const dot = {
@@ -10,23 +11,24 @@ const dot = {
   E: 'bg-slate-400/70 text-navy-950 ring-slate-200/40',
   Î: 'bg-rose-500/85 text-white ring-rose-300/40'
 } as const;
-const label = { V: 'Victorie', E: 'Egal', Î: 'Înfrângere' } as const;
 
 type Active = { match: LeagueMatch; result: FormItem['result']; team: string; x: number; y: number; key: string };
 
-const shortDate = (iso: string) =>
-  new Date(iso + 'T12:00:00').toLocaleDateString('ro-RO', { day: '2-digit', month: 'short' }).replace('.', '');
+const shortDate = (iso: string, lang: Lang) =>
+  new Date(iso + 'T12:00:00').toLocaleDateString(LOCALE[lang], { day: '2-digit', month: 'short' }).replace('.', '');
 
 /** Locurile dintr-o zonă, ex. „locurile 1–3”, „locul 4” */
-function places(zone: Zone) {
+function places(zone: Zone, lang: Lang) {
   const idx = standings.map((r, i) => (r.zone === zone ? i + 1 : 0)).filter(Boolean);
   if (!idx.length) return '';
   const a = idx[0];
   const b = idx[idx.length - 1];
-  return a === b ? `locul ${a}` : `locurile ${a}–${b}`;
+  return a === b ? t(lang).standings.place(a) : t(lang).standings.places(a, b);
 }
 
-export default function StandingsTable() {
+export default function StandingsTable({ lang = 'ro' }: { lang?: Lang }) {
+  const d = t(lang);
+  const S = d.standings;
   const [active, setActive] = useState<Active | null>(null);
 
   const show = useCallback((e: React.SyntheticEvent<HTMLButtonElement>, team: string, f: FormItem, key: string) => {
@@ -51,19 +53,19 @@ export default function StandingsTable() {
       <div className="overflow-x-auto rounded-3xl ring-1 ring-white/10" onMouseLeave={hide}>
         <table className="w-full min-w-[720px] text-left text-sm tabular-nums">
           <caption className="sr-only">
-            Clasament {club.league} după etapa {standingsRound}, cu forma din ultimele 5 meciuri
+            {S.caption(d.league, standingsRound)}
           </caption>
           <thead className="bg-navy-900 text-[11px] font-bold uppercase tracking-[.16em] text-muted">
             <tr>
               <th scope="col" className="w-12 px-4 py-3 text-center">#</th>
-              <th scope="col" className="px-2 py-3">Echipa</th>
-              <th scope="col" className="px-2 py-3 text-center" title="Meciuri">M</th>
-              <th scope="col" className="px-2 py-3 text-center" title="Victorii">V</th>
-              <th scope="col" className="px-2 py-3 text-center" title="Egaluri">E</th>
-              <th scope="col" className="px-2 py-3 text-center" title="Înfrângeri">Î</th>
-              <th scope="col" className="px-2 py-3 text-center" title="Goluri marcate:primite">Golaveraj</th>
-              <th scope="col" className="px-2 py-3 text-center">Forma echipei</th>
-              <th scope="col" className="px-4 py-3 text-center">Pct</th>
+              <th scope="col" className="px-2 py-3">{S.cols.team}</th>
+              <th scope="col" className="px-2 py-3 text-center" title={S.colTitles.p}>{S.cols.p}</th>
+              <th scope="col" className="px-2 py-3 text-center" title={S.colTitles.w}>{S.cols.w}</th>
+              <th scope="col" className="px-2 py-3 text-center" title={S.colTitles.d}>{S.cols.d}</th>
+              <th scope="col" className="px-2 py-3 text-center" title={S.colTitles.l}>{S.cols.l}</th>
+              <th scope="col" className="px-2 py-3 text-center" title={S.colTitles.goals}>{S.cols.goals}</th>
+              <th scope="col" className="px-2 py-3 text-center">{S.cols.form}</th>
+              <th scope="col" className="px-4 py-3 text-center">{S.cols.pts}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5">
@@ -88,7 +90,7 @@ export default function StandingsTable() {
                   <td className="relative px-4 py-3 text-center">
                     {zone && <span className={`absolute inset-y-1.5 left-0 w-1.5 rounded-r ${zone.bar}`} aria-hidden="true" />}
                     {i + 1}
-                    {zone && <span className="sr-only"> ({zone.label})</span>}
+                    {row.zone && <span className="sr-only"> ({S.zones[row.zone]})</span>}
                   </td>
                   <th scope="row" className="px-2 py-3 font-semibold">
                     <span className="flex items-center gap-2">
@@ -104,7 +106,7 @@ export default function StandingsTable() {
                     {row.gf}:{row.ga}
                   </td>
                   <td className="px-2 py-2">
-                    <ol className="flex items-center justify-center gap-1.5" aria-label={`Forma ${row.team}, de la cel mai vechi la cel mai recent meci`}>
+                    <ol className="flex items-center justify-center gap-1.5" aria-label={S.formAria(row.team)}>
                       {form.map(f => {
                         const key = `${row.team}-${f.match.round}`;
                         const m = f.match;
@@ -115,13 +117,13 @@ export default function StandingsTable() {
                               className={`grid h-6 w-6 place-items-center rounded-full text-[10px] font-extrabold ring-1 transition-transform duration-150 hover:scale-125 focus-visible:scale-125 ${dot[f.result]} ${
                                 hit && active?.match.round === m.round ? 'scale-125 ring-2 ring-white' : ''
                               }`}
-                              aria-label={`${label[f.result]}: etapa ${m.round}, ${m.home} ${m.hg}–${m.ag} ${m.away}`}
+                              aria-label={`${d.outcome[f.result]}: ${S.tooltipRound(m.round, shortDate(m.date, lang))}, ${m.home} ${m.hg}–${m.ag} ${m.away}`}
                               onMouseEnter={e => show(e, row.team, f, key)}
                               onFocus={e => show(e, row.team, f, key)}
                               onBlur={hide}
                               onClick={e => (active?.key === key ? hide() : show(e, row.team, f, key))}
                             >
-                              {f.result}
+                              {d.outcomeLetter[f.result]}
                             </button>
                           </li>
                         );
@@ -137,18 +139,18 @@ export default function StandingsTable() {
       </div>
 
       {/* Legenda culorilor */}
-      <ul className="mt-5 grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4" aria-label="Legenda clasamentului">
+      <ul className="mt-5 grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4" aria-label={S.legendAria}>
         {zonesShown.map(z => (
           <li key={z} className="flex items-center gap-3 rounded-2xl bg-white/[.03] px-3 py-3 ring-1 ring-white/10 sm:px-4">
             <span className={`h-8 w-1.5 shrink-0 rounded ${ZONES[z].bar}`} aria-hidden="true" />
             <span className="text-sm leading-tight">
-              <span className="block text-[13px] font-semibold text-white sm:text-sm">{ZONES[z].label}</span>
-              <span className="block text-xs capitalize text-muted">{places(z)}</span>
+              <span className="block text-[13px] font-semibold text-white sm:text-sm">{S.zones[z]}</span>
+              <span className="block text-xs capitalize text-muted">{places(z, lang)}</span>
             </span>
           </li>
         ))}
       </ul>
-      <p className="mt-3 text-xs text-muted">Forma echipei (ultimele 5 meciuri): treci cu mouse-ul (sau atinge) un cerc ca să vezi scorul.</p>
+      <p className="mt-3 text-xs text-muted">{S.formNote}</p>
 
       {active && (
         <div
@@ -158,9 +160,9 @@ export default function StandingsTable() {
         >
           <p className="flex items-center justify-between text-[10px] font-bold uppercase tracking-[.18em] text-muted">
             <span>
-              Etapa {active.match.round} · {shortDate(active.match.date)}
+              {S.tooltipRound(active.match.round, shortDate(active.match.date, lang))}
             </span>
-            <span className={`rounded-full px-2 py-0.5 ${dot[active.result]}`}>{label[active.result]}</span>
+            <span className={`rounded-full px-2 py-0.5 ${dot[active.result]}`}>{d.outcome[active.result]}</span>
           </p>
           <div className="mt-3 grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-1.5">
             {[

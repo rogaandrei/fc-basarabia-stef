@@ -63,7 +63,7 @@ const manualScorers: Record<number, string[]> = {
   8: ['Danu Garbuz ×2'],
   7: ['Andrei Cebotari', 'Nicolae Prisac'],
   6: ['Daniel Guma', 'Danu Garbuz'],
-  5: ['Viorel Ciugureanu', 'Ghenadii Rudei']
+  5: ['Viorel Ciugureanu', 'Ghenadie Rudei']
 };
 
 /**
@@ -137,7 +137,7 @@ export const playerDetails: Record<string, PlayerDetails> = {
   'Andrei Cebotari': { position: 'Mijlocaș' },
   'Virgiliu Bubulici': { position: 'Mijlocaș' },
   'Daniel Guma': { position: 'Mijlocaș' },
-  'Ghenadii Rudei': { position: 'Atacant' },
+  'Ghenadie Rudei': { position: 'Atacant' },
   'Nicolae Prisac': { position: 'Atacant' },
   'Alexei Chirpii': { position: 'Atacant' },
   'Marin Podelniuc': { position: 'Fundaș' },
@@ -155,76 +155,65 @@ export const playerDetails: Record<string, PlayerDetails> = {
 /** Câți jucători au marcat în toată Liga III-B (pentru „locul X din Y”) */
 export const leagueScorersCount: number = auto.leagueScorers;
 
-export type Spotlight = { name: string; role: string; highlight: string; badge: string; link?: string; image?: string };
-
-const goalsText = (g: number) => `${g} ${g === 1 ? 'gol' : 'goluri'}`;
-
-/** Locul în echipă după goluri (la egalitate, același loc) */
-export const teamScorerRank = (p: Player) => (p.goals > 0 ? 1 + squad.filter(o => o.goals > p.goals).length : null);
+/** Cardurile „Jucători în formă” (textele lor sunt în src/i18n/dict.tsx, în fiecare limbă) */
+export type SpotlightKind = 'mvp' | 'fan' | 'top';
+export type Spotlight = {
+  kind: SpotlightKind;
+  name: string;
+  player?: Player;
+  /** adversarul din meciul în care a fost MVP */
+  opponent?: string | null;
+  /** „Antrenor-jucător” etc. */
+  playerCoach?: boolean;
+  /** la golgheter: ceilalți jucători la egalitate */
+  tiedWith?: string[];
+  link?: string;
+  image?: string;
+};
 
 /** Golgheterul (golgheterii, la egalitate) echipei — calculat automat din goluri */
+export const teamScorerRank = (p: Player) => (p.goals > 0 ? 1 + squad.filter(o => o.goals > p.goals).length : null);
 export const topScorers = squad.filter(p => p.goals > 0 && teamScorerRank(p) === 1);
 
 type AwardPost = { name: string; names?: string[]; label?: string | null; date: string; permalink: string | null; opponent: string | null; image?: string | null };
 const ig = instagram as { fanFavorite?: AwardPost; potm?: AwardPost };
 
-/** Rolul afișat sub nume pentru anumiți jucători (în rest se calculează din goluri) */
-const roles: Record<string, string> = { 'Daniel Guma': 'Antrenor-jucător' };
+/** Jucătorii care au și rolul de antrenor */
+const playerCoaches = ['Daniel Guma'];
 
 /**
  * „Jucători în formă” — un card pe premiu, în ordinea:
  *   1. MVP (din postarea de Instagram; dacă sunt 2 MVP, apar 2 carduri)
  *   2. Fan Favorite (din postarea de Instagram)
  *   3. Golgheterul echipei (calculat din goluri)
- * Totul se actualizează automat (scripts/update-instagram.mjs + update-league.mjs).
  */
-function playerStats(p?: Player) {
-  if (!p) return '';
-  return [p.goals > 0 ? `${goalsText(p.goals)} în campionat` : null, p.leagueRank ? `locul ${p.leagueRank} în Liga III-B` : null]
-    .filter(Boolean)
-    .join(' · ');
-}
-
 function buildSpotlight(): Spotlight[] {
   const find = (name: string) => squad.find(p => p.name === name);
   const cards: Spotlight[] = [];
-
-  const mvps = (ig.potm?.names ?? (ig.potm ? [ig.potm.name] : [])).slice(0, 2);
-  for (const name of mvps) {
-    const vs = ig.potm?.opponent ? `MVP vs ${ig.potm.opponent}` : 'MVP-ul meciului';
+  for (const name of (ig.potm?.names ?? (ig.potm ? [ig.potm.name] : [])).slice(0, 2)) {
     cards.push({
+      kind: 'mvp',
       name,
-      badge: 'MVP',
-      role: roles[name] ?? 'MVP-ul meciului',
-      highlight: [vs, playerStats(find(name))].filter(Boolean).join(' · '),
+      player: find(name),
+      opponent: ig.potm?.opponent,
+      playerCoach: playerCoaches.includes(name),
       link: ig.potm?.permalink ?? undefined,
       image: ig.potm?.image ?? undefined
     });
   }
-
   const fan = ig.fanFavorite?.names?.[0] ?? ig.fanFavorite?.name;
   if (fan) {
     cards.push({
+      kind: 'fan',
       name: fan,
-      badge: 'Fan Favorite',
-      role: roles[fan] ?? 'Ales de fani',
-      highlight: ['Votat Fan Favorite de suporteri', playerStats(find(fan))].filter(Boolean).join(' · '),
+      player: find(fan),
+      playerCoach: playerCoaches.includes(fan),
       link: ig.fanFavorite?.permalink ?? undefined,
       image: ig.fanFavorite?.image ?? undefined
     });
   }
-
   const top = topScorers[0];
-  if (top) {
-    const tied = topScorers.length > 1 ? ` (la egalitate cu ${topScorers.slice(1).map(p => p.name).join(', ')})` : '';
-    cards.push({
-      name: top.name,
-      badge: 'Golgheter',
-      role: 'Golgheterul echipei',
-      highlight: playerStats(top) + tied
-    });
-  }
-
+  if (top) cards.push({ kind: 'top', name: top.name, player: top, tiedWith: topScorers.slice(1).map(p => p.name) });
   return cards;
 }
 
