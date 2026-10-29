@@ -65,7 +65,12 @@ jobs:
           git config user.name  "fc-basarabia-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "Date actualizate automat (ligă / Instagram)"
-          git push
+          # dacă între timp a apărut alt commit (ex. ai urcat tu fișiere), îl luăm întâi și apoi trimitem
+          for i in 1 2 3; do
+            git pull --rebase -X theirs origin "${GITHUB_REF_NAME}" && git push && break
+            echo "Push respins, reîncerc ($i)…"; sleep 5
+          done
+          git status -sb | head -1 | grep -q ahead && { echo "::error::Nu am putut trimite modificările"; exit 1; }
           echo "changed=1" >> "$GITHUB_ENV"
 
       - name: Pornește deploy Vercel (opțional)
