@@ -1,27 +1,27 @@
 {
   "source": "https://www.alborzminifotbal.ro/clasament-liga-III-B.html",
-  "round": 10,
+  "round": 11,
   "standings": [
     {
       "team": "Athletic",
-      "p": 10,
+      "p": 11,
       "w": 8,
       "d": 1,
-      "l": 1,
+      "l": 2,
       "gf": 42,
-      "ga": 18,
+      "ga": 21,
       "pts": 25,
       "zone": "promo"
     },
     {
       "team": "Copiii Zăpezii",
-      "p": 10,
-      "w": 7,
+      "p": 11,
+      "w": 8,
       "d": 1,
       "l": 2,
-      "gf": 40,
-      "ga": 24,
-      "pts": 22,
+      "gf": 44,
+      "ga": 27,
+      "pts": 25,
       "zone": "promo"
     },
     {
@@ -47,24 +47,35 @@
       "zone": "promoPlayoff"
     },
     {
-      "team": "Novum Team",
-      "p": 10,
+      "team": "FC Basarabia",
+      "p": 11,
       "w": 6,
       "d": 2,
-      "l": 2,
-      "gf": 32,
-      "ga": 22,
+      "l": 3,
+      "gf": 38,
+      "ga": 29,
       "pts": 20,
       "zone": null
     },
     {
-      "team": "FC Basarabia",
-      "p": 10,
-      "w": 5,
+      "team": "Novum Team",
+      "p": 11,
+      "w": 6,
       "d": 2,
       "l": 3,
       "gf": 35,
-      "ga": 29,
+      "ga": 26,
+      "pts": 20,
+      "zone": null
+    },
+    {
+      "team": "FC Terra Tim",
+      "p": 11,
+      "w": 5,
+      "d": 2,
+      "l": 4,
+      "gf": 34,
+      "ga": 36,
       "pts": 17,
       "zone": null
     },
@@ -76,17 +87,6 @@
       "l": 4,
       "gf": 26,
       "ga": 27,
-      "pts": 14,
-      "zone": null
-    },
-    {
-      "team": "FC Terra Tim",
-      "p": 10,
-      "w": 4,
-      "d": 2,
-      "l": 4,
-      "gf": 31,
-      "ga": 34,
       "pts": 14,
       "zone": null
     },
@@ -103,12 +103,12 @@
     },
     {
       "team": "Husenii",
-      "p": 10,
+      "p": 11,
       "w": 4,
       "d": 1,
-      "l": 5,
-      "gf": 32,
-      "ga": 37,
+      "l": 6,
+      "gf": 34,
+      "ga": 40,
       "pts": 13,
       "zone": null
     },
@@ -136,24 +136,24 @@
     },
     {
       "team": "B 32 Army",
-      "p": 10,
+      "p": 11,
       "w": 3,
-      "d": 1,
+      "d": 2,
       "l": 6,
-      "gf": 19,
-      "ga": 29,
-      "pts": 10,
+      "gf": 20,
+      "ga": 30,
+      "pts": 11,
       "zone": "relegPlayoff"
     },
     {
       "team": "ZF Lifetec",
-      "p": 10,
+      "p": 11,
       "w": 2,
-      "d": 0,
+      "d": 1,
       "l": 8,
-      "gf": 25,
-      "ga": 40,
-      "pts": 6,
+      "gf": 26,
+      "ga": 41,
+      "pts": 7,
       "zone": "releg"
     },
     {
@@ -906,8 +906,8 @@
       "kickoff": "2026-10-31T09:00:00+02:00",
       "home": "FC Basarabia",
       "away": "Athletic",
-      "hg": null,
-      "ag": null
+      "hg": 3,
+      "ag": 0
     },
     {
       "round": 11,
@@ -915,8 +915,8 @@
       "kickoff": "2026-10-31T10:00:00+02:00",
       "home": "FC Terra Tim",
       "away": "Husenii",
-      "hg": null,
-      "ag": null
+      "hg": 3,
+      "ag": 2
     },
     {
       "round": 11,
@@ -924,8 +924,8 @@
       "kickoff": "2026-10-31T11:00:00+02:00",
       "home": "B 32 Army",
       "away": "ZF Lifetec",
-      "hg": null,
-      "ag": null
+      "hg": 1,
+      "ag": 1
     },
     {
       "round": 11,
@@ -933,8 +933,8 @@
       "kickoff": "2026-10-31T12:00:00+02:00",
       "home": "Copiii Zăpezii",
       "away": "Novum Team",
-      "hg": null,
-      "ag": null
+      "hg": 4,
+      "ag": 3
     },
     {
       "round": 11,
@@ -1264,24 +1264,24 @@
   "squad": [
     {
       "name": "Danu Garbuz",
-      "goals": 7,
+      "goals": 8,
       "yellow": 0,
       "red": 0,
-      "leagueRank": 17
+      "leagueRank": 16
     },
     {
       "name": "Viorel Ciugureanu",
-      "goals": 6,
+      "goals": 7,
       "yellow": 0,
       "red": 0,
-      "leagueRank": 18
+      "leagueRank": 19
     },
     {
       "name": "Andrei Cebotari",
-      "goals": 5,
+      "goals": 6,
       "yellow": 1,
       "red": 0,
-      "leagueRank": 26
+      "leagueRank": 22
     },
     {
       "name": "Virgiliu Bubulici",
@@ -1295,49 +1295,49 @@
       "goals": 2,
       "yellow": 0,
       "red": 0,
-      "leagueRank": 56
+      "leagueRank": 58
     },
     {
       "name": "Ghenadie Rudei",
       "goals": 2,
       "yellow": 0,
       "red": 1,
-      "leagueRank": 56
+      "leagueRank": 58
     },
     {
       "name": "Nicolae Prisac",
       "goals": 2,
       "yellow": 0,
       "red": 0,
-      "leagueRank": 56
+      "leagueRank": 58
     },
     {
       "name": "Alexei Chirpii",
       "goals": 1,
       "yellow": 0,
       "red": 0,
-      "leagueRank": 95
+      "leagueRank": 97
     },
     {
       "name": "Marin Podelniuc",
       "goals": 1,
       "yellow": 0,
       "red": 0,
-      "leagueRank": 95
+      "leagueRank": 97
     },
     {
       "name": "Nicu Zaporojan",
       "goals": 1,
       "yellow": 0,
       "red": 0,
-      "leagueRank": 95
+      "leagueRank": 97
     },
     {
       "name": "Teodor Negru",
       "goals": 1,
       "yellow": 0,
       "red": 0,
-      "leagueRank": 95
+      "leagueRank": 97
     },
     {
       "name": "Andrei Roga",
@@ -1389,7 +1389,7 @@
       "leagueRank": null
     }
   ],
-  "leagueScorers": 144,
+  "leagueScorers": 146,
   "goalSnapshots": {
     "9": {
       "Danu Garbuz": 7,
@@ -1430,6 +1430,26 @@
       "Laurentiu Stici": 0,
       "Sergiu Andronic": 0,
       "Sergiu Dohotaru": 0
+    },
+    "11": {
+      "Danu Garbuz": 8,
+      "Viorel Ciugureanu": 7,
+      "Andrei Cebotari": 6,
+      "Virgiliu Bubulici": 3,
+      "Daniel Guma": 2,
+      "Ghenadie Rudei": 2,
+      "Nicolae Prisac": 2,
+      "Alexei Chirpii": 1,
+      "Marin Podelniuc": 1,
+      "Nicu Zaporojan": 1,
+      "Teodor Negru": 1,
+      "Andrei Roga": 0,
+      "Denis Bandol": 0,
+      "Flavius Alexandru Vacarita": 0,
+      "Ion Mocanu": 0,
+      "Laurentiu Stici": 0,
+      "Sergiu Andronic": 0,
+      "Sergiu Dohotaru": 0
     }
   },
   "autoScorers": {
@@ -1444,6 +1464,20 @@
       },
       {
         "name": "Nicu Zaporojan",
+        "goals": 1
+      }
+    ],
+    "11": [
+      {
+        "name": "Danu Garbuz",
+        "goals": 1
+      },
+      {
+        "name": "Viorel Ciugureanu",
+        "goals": 1
+      },
+      {
+        "name": "Andrei Cebotari",
         "goals": 1
       }
     ]
