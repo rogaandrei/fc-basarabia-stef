@@ -53,6 +53,14 @@ function matchPlayer(text, name) {
  * Se iau toți jucătorii din lot scriși pe primul rând de după cuvântul-cheie care conține nume;
  * dacă nu e niciunul după, se ia primul nume din toată descrierea.
  */
+/**
+ * Alte nume sub care apar jucătorii în postările de Instagram.
+ * Pe site rămâne numele oficial din lot (cel din stânga).
+ */
+const ALIASES = {
+  'Ion Mocanu': ['Nicu Mocanu']
+};
+
 export function detect(caption, squad, patterns) {
   const hits = patterns.map(p => ({ i: caption.search(p), m: caption.match(p)?.[0] })).filter(h => h.i >= 0);
   if (!hits.length) return null;
@@ -60,8 +68,13 @@ export function detect(caption, squad, patterns) {
   /** Toți jucătorii dintr-un text, cu poziția și lungimea potrivirii */
   const namesIn = text => {
     const t = fold(text);
+    // fiecare jucător e căutat după numele oficial ȘI după poreclele/celelalte nume din ALIASES
     return squad
-      .map(p => ({ name: p.name, ...matchPlayer(t, p.name) }))
+      .map(p => {
+        const hits = [p.name, ...(ALIASES[p.name] ?? [])].map(n => matchPlayer(t, n)).filter(h => h.pos >= 0);
+        const best = hits.sort((a, b) => a.pos - b.pos)[0] ?? { pos: -1, len: 0 };
+        return { name: p.name, ...best };
+      })
       .filter(x => x.pos >= 0)
       .sort((a, b) => a.pos - b.pos);
   };
