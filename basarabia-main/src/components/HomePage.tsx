@@ -5,6 +5,7 @@ import Crest from '@/components/Crest';
 import JsonLd from '@/components/JsonLd';
 import StandingsTable from '@/components/StandingsTable';
 import SquadList from '@/components/SquadList';
+import CarouselDots from '@/components/CarouselDots';
 import CalendarSubscribe from '@/components/CalendarSubscribe';
 import { googleLink, matchSlug } from '@/lib/calendar';
 import { readdirSync } from 'node:fs';
@@ -418,12 +419,12 @@ export default function HomePage({ lang }: { lang: Lang }) {
         <section id="jucatori" aria-labelledby="jucatori-title" className="bg-navy-900 py-20 sm:py-28">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <SectionHead kicker={d.spotlight.kicker} title={d.spotlight.title} id="jucatori-title" />
-            <ul className={`grid grid-cols-2 gap-3 sm:gap-5 ${spotlightPlayers.length > 3 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}>
+            <ul id="spotlight-track" className={`-mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:grid sm:snap-none sm:grid-cols-2 sm:gap-5 sm:overflow-visible sm:px-0 sm:pb-0 ${spotlightPlayers.length > 3 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}>
               {spotlightPlayers.map(sp => ({ ...sp, ...spotlightText(sp, d, lang), image: sp.image ?? (sp.kind === 'top' ? playerPhotos[sp.name] : undefined) })).map((p, i) => (
-                <li key={`${p.badge}-${p.name}`} className={spotlightPlayers.length === 3 && i === 2 ? 'col-span-2 mx-auto w-[calc(50%-0.375rem)] lg:col-span-1 lg:mx-0 lg:w-auto' : undefined}>
-                  <SpotlightCard className="h-full rounded-3xl p-3 sm:p-6" spotlightColor="rgba(142,197,255,.45)" style={cardStyle}>
+                <li key={`${p.badge}-${p.name}`} className={`w-[78%] shrink-0 snap-start sm:w-auto ${spotlightPlayers.length === 3 && i === 2 ? 'sm:col-span-2 sm:mx-auto sm:w-[calc(50%-0.625rem)] lg:col-span-1 lg:mx-0 lg:w-auto' : ''}`}>
+                  <SpotlightCard className="h-full rounded-3xl p-3 max-sm:!p-2.5 sm:p-6" spotlightColor="rgba(142,197,255,.45)" style={cardStyle}>
                     <article className="relative flex h-full flex-col">
-                      <div className="relative mb-4 flex aspect-square items-end sm:mb-6 sm:aspect-[4/5] overflow-hidden rounded-2xl bg-gradient-to-br from-brand via-navy-700 to-navy-900 p-4">
+                      <div className="relative mb-3 flex aspect-[4/5] items-end sm:mb-6 overflow-hidden rounded-2xl bg-gradient-to-br from-brand via-navy-700 to-navy-900 p-4">
                         {p.image && (
                           <>
                             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -441,11 +442,11 @@ export default function HomePage({ lang }: { lang: Lang }) {
                           {p.badge}
                         </span>
                       </div>
-                      <h3 className="display text-2xl text-white sm:text-3xl">{p.name}</h3>
-                      <p className="mt-1 text-xs font-bold uppercase tracking-[.18em] text-sky">{p.role}</p>
-                      <p className="mt-3 text-sm text-muted">{p.highlight}</p>
+                      <h3 className="display px-1.5 text-2xl text-white sm:px-0 sm:text-3xl">{p.name}</h3>
+                      <p className="mt-1 px-1.5 text-xs font-bold uppercase tracking-[.18em] text-sky sm:px-0">{p.role}</p>
+                      <p className="mt-2 px-1.5 text-sm text-muted sm:mt-3 sm:px-0">{p.highlight}</p>
                       {p.link && (
-                        <a href={p.link} target="_blank" rel="noopener noreferrer" className="mt-auto pt-4 text-xs font-semibold text-sky hover:text-white">
+                        <a href={p.link} target="_blank" rel="noopener noreferrer" className="mt-auto px-1.5 pb-1.5 pt-3 text-xs font-semibold text-sky hover:text-white sm:px-0 sm:pb-0 sm:pt-4">
                           {d.spotlight.viewPost}
                         </a>
                       )}
@@ -454,6 +455,7 @@ export default function HomePage({ lang }: { lang: Lang }) {
                 </li>
               ))}
             </ul>
+            <CarouselDots target="spotlight-track" count={spotlightPlayers.length} label={d.spotlight.title} />
           </div>
         </section>
 
