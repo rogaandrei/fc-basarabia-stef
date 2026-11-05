@@ -159,17 +159,14 @@ export default function SquadList({
               ))}
             </dl>
 
+            {active.goals > 0 && (
             <div className="space-y-4 px-6 py-6 text-sm">
-              {active.goals > 0 ? (
-                <ul className="space-y-1.5 text-muted">
-                  <li>{Q.teamRank(rank, share)}</li>
-                  {active.leagueRank && (
-                    <li>{Q.leagueRank(active.leagueRank, leagueScorersCount, d.league)}</li>
-                  )}
-                </ul>
-              ) : (
-                <p className="text-muted">{Q.noGoals}</p>
-              )}
+              <ul className="space-y-1.5 text-muted">
+                <li>{Q.teamRank(rank, share)}</li>
+                {active.leagueRank && (
+                  <li>{Q.leagueRank(active.leagueRank, leagueScorersCount, d.league)}</li>
+                )}
+              </ul>
 
               {matches.length > 0 && (
                 <div>
@@ -193,6 +190,7 @@ export default function SquadList({
                 </div>
               )}
             </div>
+            )}
           </div>
         )}
       </dialog>
