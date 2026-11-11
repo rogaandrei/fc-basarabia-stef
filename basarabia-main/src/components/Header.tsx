@@ -96,7 +96,8 @@ export default function Header({ lang = 'ro' }: { lang?: Lang }) {
 
       <div id="mobile-menu" hidden={!open} className="h-[calc(100dvh-4rem)] border-t border-white/10 bg-navy-950 px-6 py-8 md:hidden">
         <ul className="flex flex-col gap-2">
-          {[...links, { href: '#sustine', label: d.nav.support }].map(l => (
+          {/* pe telefon „Susține clubul” vine înainte de Contact, ca în pagină */}
+          {[...links.slice(0, -1), { href: '#sustine', label: d.nav.support }, links[links.length - 1]].map(l => (
             <li key={l.href}>
               <a href={l.href} onClick={() => setOpen(false)} className="display block py-2 text-5xl text-white">
                 {l.label}
