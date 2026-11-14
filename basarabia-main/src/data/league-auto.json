@@ -25,6 +25,17 @@
       "zone": "promo"
     },
     {
+      "team": "UCECOM",
+      "p": 13,
+      "w": 9,
+      "d": 1,
+      "l": 3,
+      "gf": 44,
+      "ga": 31,
+      "pts": 28,
+      "zone": "promo"
+    },
+    {
       "team": "FC Basarabia",
       "p": 13,
       "w": 8,
@@ -33,50 +44,39 @@
       "gf": 48,
       "ga": 30,
       "pts": 26,
-      "zone": "promo"
-    },
-    {
-      "team": "UCECOM",
-      "p": 12,
-      "w": 8,
-      "d": 1,
-      "l": 3,
-      "gf": 38,
-      "ga": 28,
-      "pts": 25,
       "zone": "promoPlayoff"
     },
     {
-      "team": "AS FC Real Timișoara",
-      "p": 12,
+      "team": "Novum Team",
+      "p": 13,
       "w": 8,
-      "d": 0,
-      "l": 4,
-      "gf": 61,
-      "ga": 38,
-      "pts": 24,
+      "d": 2,
+      "l": 3,
+      "gf": 42,
+      "ga": 28,
+      "pts": 26,
       "zone": null
     },
     {
-      "team": "Novum Team",
-      "p": 12,
-      "w": 7,
-      "d": 2,
-      "l": 3,
-      "gf": 38,
-      "ga": 28,
-      "pts": 23,
+      "team": "AS FC Real Timișoara",
+      "p": 13,
+      "w": 8,
+      "d": 1,
+      "l": 4,
+      "gf": 65,
+      "ga": 42,
+      "pts": 25,
       "zone": null
     },
     {
       "team": "BizCaffe",
-      "p": 12,
+      "p": 13,
       "w": 4,
-      "d": 5,
+      "d": 6,
       "l": 3,
-      "gf": 34,
-      "ga": 28,
-      "pts": 17,
+      "gf": 38,
+      "ga": 32,
+      "pts": 18,
       "zone": null
     },
     {
@@ -102,17 +102,6 @@
       "zone": null
     },
     {
-      "team": "Plopi",
-      "p": 12,
-      "w": 4,
-      "d": 2,
-      "l": 6,
-      "gf": 31,
-      "ga": 38,
-      "pts": 14,
-      "zone": null
-    },
-    {
       "team": "Vitabolic Crew",
       "p": 13,
       "w": 4,
@@ -124,15 +113,37 @@
       "zone": null
     },
     {
-      "team": "AS Viitorul Iohanisfeld",
-      "p": 12,
-      "w": 3,
+      "team": "Plopi",
+      "p": 13,
+      "w": 4,
       "d": 2,
       "l": 7,
-      "gf": 35,
-      "ga": 47,
-      "pts": 11,
+      "gf": 34,
+      "ga": 44,
+      "pts": 14,
       "zone": null
+    },
+    {
+      "team": "TMT",
+      "p": 13,
+      "w": 3,
+      "d": 3,
+      "l": 7,
+      "gf": 34,
+      "ga": 51,
+      "pts": 12,
+      "zone": null
+    },
+    {
+      "team": "AS Viitorul Iohanisfeld",
+      "p": 13,
+      "w": 3,
+      "d": 2,
+      "l": 8,
+      "gf": 37,
+      "ga": 51,
+      "pts": 11,
+      "zone": "relegPlayoff"
     },
     {
       "team": "B 32 Army",
@@ -143,7 +154,7 @@
       "gf": 21,
       "ga": 35,
       "pts": 11,
-      "zone": "relegPlayoff"
+      "zone": "releg"
     },
     {
       "team": "ZF Lifetec",
@@ -157,24 +168,13 @@
       "zone": "releg"
     },
     {
-      "team": "TMT",
-      "p": 12,
-      "w": 2,
-      "d": 3,
-      "l": 7,
-      "gf": 30,
-      "ga": 49,
-      "pts": 9,
-      "zone": "releg"
-    },
-    {
       "team": "Lex TM",
-      "p": 12,
+      "p": 13,
       "w": 3,
       "d": 0,
-      "l": 9,
+      "l": 10,
       "gf": 20,
-      "ga": 40,
+      "ga": 44,
       "pts": 9,
       "zone": "releg"
     }
@@ -1086,8 +1086,8 @@
       "kickoff": "2026-11-14T13:00:00+02:00",
       "home": "Lex TM",
       "away": "Novum Team",
-      "hg": null,
-      "ag": null
+      "hg": 0,
+      "ag": 4
     },
     {
       "round": 13,
@@ -1095,8 +1095,8 @@
       "kickoff": "2026-11-14T14:00:00+02:00",
       "home": "UCECOM",
       "away": "Plopi",
-      "hg": null,
-      "ag": null
+      "hg": 6,
+      "ag": 3
     },
     {
       "round": 13,
@@ -1104,8 +1104,8 @@
       "kickoff": "2026-11-14T15:00:00+02:00",
       "home": "AS FC Real Timișoara",
       "away": "BizCaffe",
-      "hg": null,
-      "ag": null
+      "hg": 4,
+      "ag": 4
     },
     {
       "round": 13,
@@ -1113,8 +1113,8 @@
       "kickoff": "2026-11-14T16:00:00+02:00",
       "home": "TMT",
       "away": "AS Viitorul Iohanisfeld",
-      "hg": null,
-      "ag": null
+      "hg": 4,
+      "ag": 2
     },
     {
       "round": 14,
@@ -1267,7 +1267,7 @@
       "goals": 9,
       "yellow": 1,
       "red": 0,
-      "leagueRank": 14
+      "leagueRank": 15
     },
     {
       "name": "Danu Garbuz",
@@ -1281,84 +1281,84 @@
       "goals": 7,
       "yellow": 0,
       "red": 0,
-      "leagueRank": 22
+      "leagueRank": 23
     },
     {
       "name": "Ghenadie Rudei",
       "goals": 4,
       "yellow": 0,
       "red": 1,
-      "leagueRank": 40
+      "leagueRank": 43
     },
     {
       "name": "Daniel Guma",
       "goals": 3,
       "yellow": 0,
       "red": 0,
-      "leagueRank": 52
+      "leagueRank": 54
     },
     {
       "name": "Virgiliu Bubulici",
       "goals": 3,
       "yellow": 1,
       "red": 0,
-      "leagueRank": 52
+      "leagueRank": 54
     },
     {
       "name": "Alexei Chirpii",
       "goals": 2,
       "yellow": 0,
       "red": 0,
-      "leagueRank": 72
+      "leagueRank": 76
     },
     {
       "name": "Nicolae Prisac",
       "goals": 2,
       "yellow": 0,
       "red": 0,
-      "leagueRank": 72
+      "leagueRank": 76
     },
     {
       "name": "Andrei Roga",
       "goals": 1,
       "yellow": 1,
       "red": 0,
-      "leagueRank": 112
+      "leagueRank": 115
     },
     {
       "name": "Denis Bandol",
       "goals": 1,
       "yellow": 0,
       "red": 0,
-      "leagueRank": 112
+      "leagueRank": 115
     },
     {
       "name": "Laurentiu Stici",
       "goals": 1,
       "yellow": 0,
       "red": 0,
-      "leagueRank": 112
+      "leagueRank": 115
     },
     {
       "name": "Marin Podelniuc",
       "goals": 1,
       "yellow": 0,
       "red": 0,
-      "leagueRank": 112
+      "leagueRank": 115
     },
     {
       "name": "Nicu Zaporojan",
       "goals": 1,
       "yellow": 0,
       "red": 0,
-      "leagueRank": 112
+      "leagueRank": 115
     },
     {
       "name": "Teodor Negru",
       "goals": 1,
       "yellow": 0,
       "red": 0,
-      "leagueRank": 112
+      "leagueRank": 115
     },
     {
       "name": "Flavius Alexandru Vacarita",
@@ -1389,7 +1389,7 @@
       "leagueRank": null
     }
   ],
-  "leagueScorers": 161,
+  "leagueScorers": 162,
   "goalSnapshots": {
     "9": {
       "Danu Garbuz": 7,
